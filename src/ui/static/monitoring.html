@@ -411,7 +411,7 @@
             }
         }
 
-        function refreshAll() {
+        function loadActiveTab() {
             if (currentTab === 'system') {
                 loadHealth();
                 loadMetrics();
@@ -426,6 +426,11 @@
                 clearLogs();
                 initLogsTab();
             }
+        }
+
+        // Refresh button: reload the active tab and confirm with a toast.
+        function refreshAll() {
+            loadActiveTab();
             toast.success('Refreshed');
         }
 
@@ -1344,8 +1349,8 @@
             // Setup tab switching
             setupTabSwitching();
 
-            // Load initial data (Jobs tab)
-            refreshAll();
+            // Load initial data for the active tab (no toast on page load)
+            loadActiveTab();
 
             // Initialize filter dropdowns for System tab
             document.getElementById('filterService')?.addEventListener('change', loadAgentActions);
