@@ -7,10 +7,13 @@ A live reference of every token and component is served at **`/static/design-sys
 ## Principles
 
 - **Monochrome first.** A soft, slightly warm neutral scale carries the whole interface. The only hues are the three semantic families (green = success, orange = warning, red = danger). They always appear as soft tints with a darker, readable foreground, never as loud solid fills. "Info" is neutral.
+- **Colour means an outcome, not a state.** "Enabled", "Running" and "Public" are states, so they use the neutral `.badge-on` look; "Disabled" and "Private" use `.badge-off`. Green is kept for real successes (a test passed, a run completed, an account is connected), orange for things that need attention and red for failures.
 - **One accent, swappable.** Everything that signals "primary" or "active" reads from a single `--color-accent` token. By default that is the ink colour itself.
 - **Accessible by default.** Text meets WCAG AA in both themes. Input and toggle edges meet 3:1 non-text contrast. Every control has a visible `:focus-visible` ring, touch targets are 44px on phones, and `prefers-reduced-motion` is respected.
 - **Whitespace over chrome.** Content sits directly on the canvas and is grouped in white cards with a hairline border. Shadows are soft and used sparingly.
 - **Inter, self-hosted.** Inter (variable, SIL OFL) ships in `static/fonts/`, so there are no third-party font requests and the PWA works offline. Stylistic sets `cv05` (tailed *l*) and `cv11` (single-storey *a*) are enabled for legibility and a friendlier texture.
+- **Monospace only for real code.** Inline `<code>` in the interface (tool names, cron expressions) is set in Inter on a subtle chip. Geist Mono (self-hosted, SIL OFL) is used only for code blocks, inline code inside chat replies, the log stream and JSON editors.
+- **Lucide icons only.** Every icon comes from [Lucide](https://lucide.dev) (ISC). No emoji or Unicode glyphs stand in for icons.
 
 ## Files and load order
 
@@ -71,7 +74,7 @@ All components live in `css/components.css`. Existing class names used by the Ja
 | Toggle | `label.toggle-label` > `input.toggle-input` + `span.toggle-slider` (+ `span.toggle-text`) |
 | Checkbox / radio | Native inputs (tinted via `accent-color`), `.checkbox-label`, `.radio-label`, `.radio-group` |
 | Card | `.card` (+ `.card-header`, `.card-footer`, `.card-flush` for edge-to-edge tables), `.stat-card` |
-| Badge | `.badge` + `.badge-{success,warning,danger,neutral,accent,outline}`, optional `.status-dot` inside |
+| Badge | `.badge` + `.badge-{success,warning,danger,neutral}` for outcomes, `.badge-on` / `.badge-off` for states, `.badge-outline`; optional `.status-dot` inside |
 | Alert | `.alert` + `.alert-{info,success,warning,danger}` |
 | Tabs | `.tabs` > `button.tab(.active)`, a segmented control |
 | Table | `.table` (or legacy `.jobs-table`); add `.table-stack` + `data-label` on cells to stack into cards on phones |
@@ -79,7 +82,16 @@ All components live in `css/components.css`. Existing class names used by the Ja
 | Toast | `toast.success()` / `.error()` / `.warning()` / `.info()` from `common.js` |
 | Feedback | `.spinner`, `.skeleton`, `.empty-state` |
 
-Icons come from the inline SVG sprite in `js/components.js`. Use them as `<svg class="icon"><use href="#icon-name"></use></svg>`. Prefer these over emoji for interface controls. Service and agent emoji are displayed desaturated inside neutral icon tiles.
+## Icons
+
+Icons are [Lucide](https://lucide.dev) (ISC licence), bundled as an inline SVG sprite in `js/components.js` and generated from `lucide-static` 0.468.0. The design-system page lists every available icon.
+
+- In JavaScript: `icon('check')` returns the markup, and `icon('loader', 'icon-spin')` adds a class.
+- In HTML: `<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>`.
+- Icons inherit `currentColor`. The `.icon` class sets a 1.75 stroke and a size of 1.15em; override `width`/`height` per context.
+- Services, agents and plugins map to Lucide icons in `getServiceIcon()` and `getAgentIcon()` (`js/settings.js`). The sprite ids are prefixed with `svc-` and `agent-`.
+- To add an icon, copy the inner elements of `lucide-static/icons/<name>.svg` into a new `<symbol id="icon-<name>" viewBox="0 0 24 24">`. Leave out presentation attributes so CSS can style it.
+- Data-URI icons in CSS (the select chevron and the sidebar search) use the same Lucide paths.
 
 ## Writing UI copy
 

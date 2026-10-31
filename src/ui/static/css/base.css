@@ -46,6 +46,17 @@
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+/* Geist Mono (variable, latin) - a clean, modern monospace for code
+   blocks and logs. SIL OFL 1.1 - see /static/fonts/GeistMono-LICENSE.txt. */
+@font-face {
+    font-family: 'Geist Mono';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('../fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations'),
+         url('../fonts/geist-mono-latin-wght-normal.woff2') format('woff2');
+}
+
 /* --------------------------------------------------------------------------
    Reset
    -------------------------------------------------------------------------- */
@@ -176,17 +187,27 @@ a:hover {
     text-decoration-color: currentColor;
 }
 
-code,
-kbd,
-samp,
-pre {
+/* Multi-line code is monospace (Geist Mono). Inline <code> in the UI is
+   usually an identifier (a tool name, a cron expression) and reads better
+   in Inter, so it gets a subtle chip instead of a different typeface.
+   Chat messages opt back into mono for inline code (pages/chat.css). */
+pre,
+pre code,
+samp {
     font-family: var(--font-mono);
     font-size: 0.9em;
     font-feature-settings: normal;
     letter-spacing: 0;
 }
 
+kbd {
+    font-family: inherit;
+}
+
 :not(pre) > code {
+    font-family: inherit;
+    font-size: 0.9em;
+    font-variant-numeric: tabular-nums;
     padding: 0.1em 0.4em;
     border-radius: var(--radius-xs);
     background: var(--color-sunken);

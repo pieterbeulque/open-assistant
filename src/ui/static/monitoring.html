@@ -368,15 +368,15 @@
 
                 const actionsHtml = data.logs.map(log => {
                     const details = log.details || {};
-                    const statusIcon = log.success ? '✓' : '✗';
-                    const statusColor = log.success ? 'var(--success-color)' : 'var(--error-color)';
+                    const statusIcon = icon(log.success ? 'circle-check' : 'circle-x');
+                    const statusColor = log.success ? 'var(--color-success-fg)' : 'var(--color-danger-fg)';
                     const execTime = details.execution_time_ms || 0;
 
                     return `
                         <div class="log-entry" style="cursor: pointer;" onclick="toggleDetails('action-${log.id}')">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <span style="color: ${statusColor}; margin-right: 8px; font-weight: bold;">${statusIcon}</span>
+                                    <span style="color: ${statusColor}; margin-right: 8px; display: inline-flex; vertical-align: -3px;">${statusIcon}</span>
                                     <span style="font-weight: 500;">${log.service_name || 'unknown'}</span>
                                     <span style="margin: 0 8px; color: var(--text-muted);">•</span>
                                     <span>${log.action}</span>

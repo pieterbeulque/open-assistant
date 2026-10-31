@@ -81,7 +81,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--color-success-solid);
+    background: var(--color-text-tertiary);
 }
 
 /* --------------------------------------------------------------------------
@@ -166,6 +166,13 @@
     font-size: var(--text-sm);
 }
 
+.message.user .attachment-banner .icon {
+    width: 14px;
+    height: 14px;
+    margin-right: var(--space-1);
+    vertical-align: -2px;
+}
+
 /* --------------------------------------------------------------------------
    Markdown inside assistant messages
    -------------------------------------------------------------------------- */
@@ -214,7 +221,8 @@
 }
 
 .message.assistant .message-content :not(pre) > code {
-    font-size: 0.86em;
+    font-family: var(--font-mono);
+    font-size: 0.84em;
 }
 
 .message.assistant .message-content pre {
@@ -330,8 +338,8 @@
 }
 
 .tool-call-card.done .tool-call-icon {
-    background: var(--color-success-bg);
-    color: var(--color-success-fg);
+    background: var(--color-accent-subtle);
+    color: var(--color-text);
 }
 
 .tool-call-card.failed {
@@ -355,9 +363,8 @@
 .tool-call-name {
     flex-shrink: 0;
     color: var(--color-text);
-    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-semibold);
 }
 
 .tool-call-args {
@@ -540,8 +547,9 @@
 }
 
 .cancel-btn .icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
 }
 
 .cancel-btn:hover {
@@ -586,8 +594,15 @@
     font-size: var(--text-xs);
 }
 
-.attachment-chip > span:first-child {
-    filter: grayscale(1);
+.attachment-chip-icon {
+    display: inline-flex;
+    color: var(--color-text-tertiary);
+}
+
+.attachment-chip-icon .icon,
+.attachment-chip-remove .icon {
+    width: 14px;
+    height: 14px;
 }
 
 .attachment-chip-name {

@@ -167,10 +167,19 @@
     color: var(--color-text);
 }
 
-.navbar-collapse-icon {
+.navbar-collapse-icon,
+.navbar-expand-icon {
     width: 18px;
     height: 18px;
-    transition: transform var(--duration-base) var(--ease-out);
+}
+
+.navbar-expand-icon,
+.navbar.collapsed .navbar-collapse-icon {
+    display: none;
+}
+
+.navbar.collapsed .navbar-expand-icon {
+    display: inline-block;
 }
 
 @media (min-width: 769px) {
@@ -243,9 +252,6 @@
         padding: 0;
     }
 
-    .navbar.collapsed .navbar-collapse-icon {
-        transform: rotate(180deg);
-    }
 }
 
 /* ==========================================================================
@@ -346,7 +352,7 @@
 
 .sidebar-filters input {
     padding-left: 34px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: 11px center;
     background-size: 15px;
@@ -356,7 +362,7 @@
     appearance: none;
     -webkit-appearance: none;
     padding-right: var(--space-8);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 16px;
@@ -470,8 +476,17 @@
     color: var(--color-text);
 }
 
+.pin-button .icon {
+    width: 14px;
+    height: 14px;
+}
+
 .pin-button.pinned {
     color: var(--color-text);
+}
+
+.pin-button.pinned .icon {
+    fill: currentColor;
 }
 
 .conversation-meta {
@@ -641,7 +656,7 @@
     border-color: var(--color-border-strong);
 }
 
-.integration-card:has(.integration-body[style*="block"]) {
+.integration-card.is-expanded {
     box-shadow: var(--shadow-sm);
 }
 
@@ -669,8 +684,7 @@
     font-weight: var(--weight-semibold);
 }
 
-/* Monochrome icon tile - service emoji are desaturated so they read as
-   glyphs rather than colourful stickers. */
+/* Icon tile for services, agents and plugins (Lucide icon inside) */
 .integration-icon,
 .agent-icon {
     display: inline-flex;
@@ -682,17 +696,40 @@
     border-radius: var(--radius-md);
     background: var(--color-sunken);
     border: 1px solid var(--color-border-subtle);
-    font-size: 1.05rem;
-    line-height: 1;
-    filter: grayscale(1);
+    color: var(--color-text-secondary);
+}
+
+.integration-icon .icon,
+.agent-icon .icon {
+    width: 18px;
+    height: 18px;
+}
+
+.integration-subtitle {
+    margin-left: var(--space-2);
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+}
+
+.integration-title h4 .badge {
+    margin-left: var(--space-2);
 }
 
 .expand-icon {
     display: inline-flex;
-    margin-left: var(--space-1);
+    margin-left: var(--space-0-5);
     color: var(--color-text-tertiary);
-    font-size: 0.6rem;
     transition: transform var(--duration-base) var(--ease-out);
+}
+
+.expand-icon .icon {
+    width: 16px;
+    height: 16px;
+}
+
+.expand-icon.expanded {
+    transform: rotate(180deg);
 }
 
 .integration-body {
@@ -833,6 +870,11 @@
     font-weight: var(--weight-medium);
 }
 
+.meta-item .icon {
+    width: 12px;
+    height: 12px;
+}
+
 .meta-item.text-success {
     background: var(--color-success-bg);
     color: var(--color-success-fg);
@@ -856,6 +898,12 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+}
+
+.btn-priority .icon {
+    width: 12px;
+    height: 12px;
+    stroke-width: 2.25;
 }
 
 .btn-priority {
@@ -914,7 +962,15 @@
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
     user-select: none;
-    filter: grayscale(1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.tool-zone-header .icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-secondary);
 }
 
 .tool-zone-count {
@@ -966,7 +1022,13 @@
 }
 
 .tool-chip-icon {
-    filter: grayscale(1);
+    display: inline-flex;
+    color: var(--color-text-tertiary);
+}
+
+.tool-chip-icon .icon {
+    width: 14px;
+    height: 14px;
 }
 
 .tool-chip-dragging {
@@ -1038,10 +1100,10 @@
     border-radius: var(--radius-lg);
     background: var(--color-sunken);
     color: var(--color-text);
-    font-family: var(--font-mono);
     font-size: 1.75rem;
     font-weight: var(--weight-semibold);
-    letter-spacing: 0.35em;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.3em;
     cursor: pointer;
     user-select: all;
     transition: border-color var(--duration-fast) ease;
@@ -1156,7 +1218,6 @@
     border-radius: var(--radius-xs);
     background: var(--color-sunken);
     color: var(--color-text-secondary);
-    font-family: var(--font-mono);
     font-size: var(--text-xs);
     overflow-wrap: anywhere;
 }

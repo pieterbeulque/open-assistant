@@ -40,6 +40,11 @@
         .ds-demo-modal .modal-content { animation: none; }
         .ds-demo-toast { position: static; }
         .ds-brand-input { width: 120px; }
+        .ds-icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--space-1); }
+        .ds-icon { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-1); border-radius: var(--radius-md); color: var(--color-text); font-size: var(--text-xs); }
+        .ds-icon:hover { background: var(--color-fill-hover); }
+        .ds-icon .icon { width: 20px; height: 20px; }
+        .ds-icon span { color: var(--color-text-tertiary); text-align: center; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -66,6 +71,7 @@
             <a class="chip" href="#color">Colour</a>
             <a class="chip" href="#type">Typography</a>
             <a class="chip" href="#space">Spacing &amp; shape</a>
+            <a class="chip" href="#icons">Icons</a>
             <a class="chip" href="#buttons">Buttons</a>
             <a class="chip" href="#forms">Forms</a>
             <a class="chip" href="#feedback">Badges &amp; alerts</a>
@@ -87,7 +93,7 @@
         <!-- TYPE -->
         <section class="ds-section" id="type">
             <h2>Typography</h2>
-            <p class="ds-lead">Inter, self-hosted, with a single-storey <em>a</em> and a tailed <em>l</em> for a friendlier, more legible texture. Body text is 15px; chat is 16px.</p>
+            <p class="ds-lead">Inter, self-hosted, with a single-storey <em>a</em> and a tailed <em>l</em> for a friendlier, more legible texture. Body text is 15px; chat is 16px. Inline identifiers stay in Inter; Geist Mono is reserved for real code (code blocks, logs, JSON).</p>
             <div class="card">
                 <div class="ds-type-row"><code>--text-2xl / 28</code><span style="font-size:var(--text-2xl);font-weight:600;letter-spacing:-0.02em">Good morning, Sofie</span></div>
                 <div class="ds-type-row"><code>--text-xl / 22</code><span style="font-size:var(--text-xl);font-weight:600">Your day at a glance</span></div>
@@ -96,7 +102,8 @@
                 <div class="ds-type-row"><code>--text-base / 15</code><span>Connect the services your assistant can use on your behalf.</span></div>
                 <div class="ds-type-row"><code>--text-sm / 13</code><span class="text-sm text-secondary">Last synced 4 minutes ago</span></div>
                 <div class="ds-type-row"><code>--text-xs / 12</code><span class="text-xs text-tertiary">Updated by system · 14:02</span></div>
-                <div class="ds-type-row"><code>--font-mono</code><code style="flex:none;font-size:var(--text-sm);color:var(--color-text)">google_calendar_list_events()</code></div>
+                <div class="ds-type-row"><code>inline code</code><span>Runs <code>google_calendar_list_events</code> every <code>0 7 * * 1-5</code></span></div>
+                <div class="ds-type-row"><code>--font-mono</code><span style="font-family:var(--font-mono);font-size:var(--text-sm)">{"tool": "google_calendar_list_events", "days": 7}</span></div>
             </div>
         </section>
 
@@ -126,6 +133,15 @@
                         <div class="ds-shadow" style="box-shadow:var(--shadow-lg)">lg</div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ICONS -->
+        <section class="ds-section" id="icons">
+            <h2>Icons</h2>
+            <p class="ds-lead">Every icon is from <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a>, served from one inline sprite in <code>js/components.js</code>. Use <code>icon('name')</code> in JS or <code>&lt;svg class="icon"&gt;&lt;use href="#icon-name"&gt;</code> in HTML. Icons inherit the text colour.</p>
+            <div class="card">
+                <div class="ds-icon-grid" id="ds-icons"></div>
             </div>
         </section>
 
@@ -224,7 +240,8 @@
                     <span class="badge badge-success"><span class="status-dot"></span>Connected</span>
                     <span class="badge badge-warning"><span class="status-dot"></span>Expires soon</span>
                     <span class="badge badge-danger"><span class="status-dot"></span>Failed</span>
-                    <span class="badge badge-neutral">Disabled</span>
+                    <span class="badge badge-on">Enabled</span>
+                    <span class="badge badge-off">Disabled</span>
                     <span class="badge badge-accent">Saved</span>
                     <span class="badge badge-outline">MCP</span>
                     <span class="meta-item">15 tools assigned</span>
@@ -260,8 +277,8 @@
                     <table class="table table-stack">
                         <thead><tr><th>Name</th><th>Schedule</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
-                            <tr><td data-label="Name">Morning briefing</td><td data-label="Schedule"><code>0 7 * * 1-5</code></td><td data-label="Status"><span class="badge badge-success">Enabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn">Edit</button></div></td></tr>
-                            <tr><td data-label="Name">Weekly invoice check</td><td data-label="Schedule"><code>0 9 * * 1</code></td><td data-label="Status"><span class="badge badge-neutral">Disabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn btn-danger">Delete</button></div></td></tr>
+                            <tr><td data-label="Name">Morning briefing</td><td data-label="Schedule"><code>0 7 * * 1-5</code></td><td data-label="Status"><span class="badge badge-on">Enabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn">Edit</button></div></td></tr>
+                            <tr><td data-label="Name">Weekly invoice check</td><td data-label="Schedule"><code>0 9 * * 1</code></td><td data-label="Status"><span class="badge badge-off">Disabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn btn-danger">Delete</button></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -283,7 +300,7 @@
             <div class="ds-grid-2">
                 <div class="modal ds-demo-modal">
                     <div class="modal-content">
-                        <div class="modal-header"><h2>Add MCP server</h2><button class="modal-close" aria-label="Close">&times;</button></div>
+                        <div class="modal-header"><h2>Add MCP server</h2><button class="modal-close" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button></div>
                         <div class="modal-body">
                             <div class="form-group"><label for="ds-mcp">Server URL</label><input class="form-input" id="ds-mcp" placeholder="https://example.com/mcp"></div>
                         </div>
@@ -351,6 +368,12 @@
         }
         swatches('swatches-neutral', neutral);
         swatches('swatches-semantic', semantic);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ids = [...document.querySelectorAll('#oa-icon-sprite symbol')].map(sym => sym.id.replace('icon-', ''));
+            document.getElementById('ds-icons').innerHTML = ids
+                .map(id => `<div class="ds-icon">${icon(id)}<span>${id}</span></div>`).join('');
+        });
 
         document.getElementById('ds-spacing').innerHTML = ['1', '2', '3', '4', '5', '6', '8', '10', '12', '16']
             .map(n => `<div class="ds-space"><code style="width:84px;padding:0;border:none;background:none">--space-${n}</code><div class="ds-space-bar" style="width:var(--space-${n})"></div></div>`).join('');

@@ -749,7 +749,7 @@ async function createIntegrationCard(serviceName) {
                 <div class="integration-title">
                     <span class="integration-icon">${getServiceIcon(serviceName)}</span>
                     <h4>${getServiceDisplayName(serviceName)}</h4>
-                    <span class="expand-icon">▼</span>
+                    <span class="expand-icon">${icon('chevron-down')}</span>
                 </div>
                 <label class="toggle-label" onclick="event.stopPropagation()">
                     <input
@@ -764,7 +764,7 @@ async function createIntegrationCard(serviceName) {
             <div class="integration-body" style="display: none;">
                 ${(!isManaged || managedFields.length === 0) && !isNoConfigService ? `<div class="integration-help">
                     <a href="${docUrl}" target="_blank" class="help-link">
-                        How to get ${getServiceDisplayName(serviceName)} credentials →
+                        How to get ${getServiceDisplayName(serviceName)} credentials ${icon('arrow-up-right')}
                     </a>
                 </div>` : ''}
                 <div class="integration-settings">
@@ -786,7 +786,7 @@ async function createIntegrationCard(serviceName) {
         card.innerHTML = `
             <div class="integration-header">
                 <div class="integration-title">
-                    <span class="integration-icon">⚠️</span>
+                    <span class="integration-icon">${icon('alert')}</span>
                     <h4>${getServiceDisplayName(serviceName)}</h4>
                 </div>
             </div>
@@ -798,25 +798,28 @@ async function createIntegrationCard(serviceName) {
     }
 }
 
+// Lucide icon per service (sprite ids in js/components.js)
+const SERVICE_ICON_NAMES = {
+    google: 'svc-google',
+    google_navigator: 'svc-map',
+    google_ads: 'svc-ads',
+    outlook: 'svc-mail',
+    notion: 'svc-notion',
+    nextcloud: 'svc-cloud',
+    whatsapp: 'svc-whatsapp',
+    slack: 'svc-slack',
+    brave: 'svc-search',
+    browser: 'svc-globe',
+    whisper: 'svc-mic',
+    mistral_ocr: 'svc-ocr',
+    toggl: 'svc-timer',
+    google_news: 'svc-news',
+    yahoo_finance: 'svc-finance',
+    system: 'svc-system',
+};
+
 function getServiceIcon(service) {
-    const icons = {
-        google: '🔵',
-        google_navigator: '🗺️',
-        google_ads: '📊',
-        outlook: '📨',
-        notion: '📝',
-        nextcloud: '☁️',
-        whatsapp: '💬',
-        slack: '📢',
-        brave: '🔎',
-        browser: '🌐',
-        whisper: '🎙️',
-        mistral_ocr: '🔍',
-        toggl: '⏱️',
-        google_news: '📰',
-        yahoo_finance: '📈'
-    };
-    return icons[service] || '🔧';
+    return icon(SERVICE_ICON_NAMES[service] || 'svc-plug');
 }
 
 function getServiceDisplayName(service) {
@@ -864,7 +867,7 @@ function renderConnectionStatus(hasCredentials, service) {
     if (hasCredentials) {
         return '<span class="status-badge status-success">Connected</span>';
     } else {
-        return '<span class="status-badge status-warning">Not Configured</span>';
+        return '<span class="status-badge status-disabled">Not configured</span>';
     }
 }
 
@@ -888,13 +891,10 @@ function toggleIntegrationExpanded(service) {
     const body = card.querySelector('.integration-body');
     const icon = card.querySelector('.expand-icon');
 
-    if (body.style.display === 'none') {
-        body.style.display = 'block';
-        icon.textContent = '▲';
-    } else {
-        body.style.display = 'none';
-        icon.textContent = '▼';
-    }
+    const expanded = body.style.display === 'none';
+    body.style.display = expanded ? 'block' : 'none';
+    if (icon) icon.classList.toggle('expanded', expanded);
+    card.classList.toggle('is-expanded', expanded);
 }
 
 async function saveIntegration(service) {
@@ -1239,12 +1239,12 @@ function getStatusClass(status) {
 
 function getStatusText(status) {
     const map = {
-        'connected': '✓ Connected',
-        'expired': '⚠ Expired',
-        'error': '✗ Error',
-        'not_configured': '○ Not Configured'
+        'connected': 'Connected',
+        'expired': 'Expired',
+        'error': 'Error',
+        'not_configured': 'Not configured'
     };
-    return map[status] || '○ Unknown';
+    return map[status] || 'Unknown';
 }
 
 async function refreshConnectionStatus(service) {
@@ -1584,7 +1584,7 @@ async function testConnection(service) {
 
         // Show result
         if (response.status === 'connected' || response.status === 'success') {
-            toast.success(`✓ ${service} connection successful!`);
+            toast.success(`${service} connection successful`);
         } else if (response.status === 'warning') {
             // For warning status, show as info with better message
             toast.info(`${service}: Credentials configured. ${response.message}`);
@@ -1596,7 +1596,7 @@ async function testConnection(service) {
                 // Could open auth URL in popup if needed
             }
         } else if (response.status === 'error') {
-            toast.error(`✗ ${response.message}`);
+            toast.error(response.message);
         } else {
             toast.warning(`${service}: ${response.message || 'Unknown status'}`);
         }
@@ -1654,7 +1654,7 @@ function createAgentCard(agent, index, total) {
     }
 
     const toolsCount = agent.tools ? agent.tools.length : 0;
-    const statusClass = agent.enabled ? 'status-success' : 'status-warning';
+    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const isCoordinator = agent.name === 'coordinator';
 
@@ -1666,8 +1666,8 @@ function createAgentCard(agent, index, total) {
             <div class="agent-header">
                 <div class="agent-title">
                     <div class="agent-priority-controls">
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up">&#9650;</button>
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down">&#9660;</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up" aria-label="Move up">${icon('chevron-up')}</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down" aria-label="Move down">${icon('chevron-down')}</button>
                     </div>
                     <span class="agent-icon">${getAgentIcon(agent.name)}</span>
                     <div class="agent-info">
@@ -1709,7 +1709,7 @@ function createAgentCard(agent, index, total) {
 
 function createMcpAgentCard(agent, index, total) {
     const srv = (settingsState.mcpServers || {})[agent.name] || {};
-    const statusClass = agent.enabled ? 'status-success' : 'status-warning';
+    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const serverId = agent.name.slice('mcp_'.length);
     const authType = srv.auth_type || 'header';
@@ -1730,8 +1730,8 @@ function createMcpAgentCard(agent, index, total) {
     const oauthAuthorized = srv.oauth_authorized === true;
     const oauthStatusHtml = authType === 'oauth2'
         ? (oauthAuthorized
-            ? '<span class="meta-item text-success">✓ Authorized</span>'
-            : '<span class="meta-item text-warning">⚠ Not authorized</span>')
+            ? `<span class="meta-item text-success">${icon('check')}Authorized</span>`
+            : `<span class="meta-item text-warning">${icon('alert')}Not authorized</span>`)
         : '';
 
     const footerButtons = authType === 'oauth2'
@@ -1750,10 +1750,10 @@ function createMcpAgentCard(agent, index, total) {
             <div class="agent-header">
                 <div class="agent-title">
                     <div class="agent-priority-controls">
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up">&#9650;</button>
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down">&#9660;</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up" aria-label="Move up">${icon('chevron-up')}</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down" aria-label="Move down">${icon('chevron-down')}</button>
                     </div>
-                    <span class="agent-icon">${escapeHtml(srv.icon || '🔌')}</span>
+                    <span class="agent-icon">${icon('server')}</span>
                     <div class="agent-info">
                         <h4>${escapeHtml(agent.display_name)} <span class="badge badge-outline badge-sm">MCP</span></h4>
                         <small class="text-muted" title="${escapeAttr(url)}">${escapeHtml(url.length > 60 ? url.slice(0,57)+'…' : url)}</small>
@@ -1790,18 +1790,18 @@ function createMcpAgentCard(agent, index, total) {
 }
 
 function getAgentIcon(agentName) {
-    const icons = {
-        coordinator: '🎯',
-        research: '🔍',
-        communication: '📨',
-        planner: '📅',
-        browser: '🌐',
-        writer: '✍️',
-        file_handler: '📁',
-        system: '⚙️',
-        navigator: '🗺️'
+    const names = {
+        coordinator: 'agent-coordinator',
+        research: 'agent-research',
+        communication: 'agent-communication',
+        planner: 'agent-planner',
+        browser: 'agent-browser',
+        writer: 'agent-writer',
+        file_handler: 'agent-files',
+        system: 'agent-system',
+        navigator: 'agent-navigator',
     };
-    return icons[agentName] || '🤖';
+    return icon(names[agentName] || 'agent-default');
 }
 
 function escapeHtml(str) {
@@ -2093,20 +2093,6 @@ async function createNewAgent() {
 // TOOLS TAB - DRAG & DROP
 // ============================================================================
 
-const SERVICE_ICONS = {
-    google: '🔵',
-    google_navigator: '🗺️',
-    outlook: '📨',
-    notion: '📝',
-    nextcloud: '☁️',
-    whatsapp: '💬',
-    slack: '📢',
-    brave: '🔎',
-    browser: '🌐',
-    google_news: '📰',
-    system: '⚙️'
-};
-
 function escapeHtmlText(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -2149,21 +2135,21 @@ function getAllToolsFlat() {
 }
 
 function buildToolChip(tool) {
-    const icon = SERVICE_ICONS[tool.service] || '🔧';
+    const toolIcon = getServiceIcon(tool.service);
     const name = escapeAttr(tool.tool_name);
     const displayName = escapeHtmlText(tool.display_name);
     const description = escapeAttr(tool.description || '');
-    return `<div class="tool-chip" draggable="true" data-tool="${name}" title="${description}" ondragstart="onToolDragStart(event)"><span class="tool-chip-icon" aria-hidden="true">${icon}</span>${displayName}</div>`;
+    return `<div class="tool-chip" draggable="true" data-tool="${name}" title="${description}" ondragstart="onToolDragStart(event)"><span class="tool-chip-icon">${toolIcon}</span>${displayName}</div>`;
 }
 
-function buildDropZone(label, zoneId, tools) {
+function buildDropZone(label, zoneId, tools, iconHtml = '') {
     const chips = tools.map(t => buildToolChip(t)).join('');
     const escapedLabel = escapeHtmlText(label);
     const count = tools.length;
     return `
         <div class="tool-drop-zone" data-zone="${escapeAttr(zoneId)}"
              ondragover="onToolDragOver(event)" ondragleave="onToolDragLeave(event)" ondrop="onToolDrop(event)">
-            <div class="tool-zone-header">${escapedLabel} <span class="tool-zone-count">${count}</span></div>
+            <div class="tool-zone-header">${iconHtml}${escapedLabel} <span class="tool-zone-count">${count}</span></div>
             <div class="tool-zone-body">${chips || '<span class="tool-zone-empty">Drop tools here</span>'}</div>
         </div>
     `;
@@ -2188,8 +2174,7 @@ function renderToolsDragDrop() {
 
     let html = buildDropZone('Unassigned', '__unassigned__', unassigned);
     for (const { agent, tools } of agentZones) {
-        const icon = getAgentIcon(agent.name);
-        html += buildDropZone(`${icon} ${agent.display_name}`, agent.name, tools);
+        html += buildDropZone(agent.display_name, agent.name, tools, getAgentIcon(agent.name));
     }
 
     container.innerHTML = html;
@@ -2394,9 +2379,9 @@ function createPluginCard(plugin) {
     card.innerHTML = `
         <div class="integration-header" onclick="togglePluginCard('${plugin.id}')">
             <div class="integration-title">
-                <span class="integration-icon">${plugin.icon}</span>
-                <h4>${plugin.display_name}<span class="text-muted" style="font-size:0.82rem; margin-left:8px; font-weight:400;">${authLabel} · ${plugin.endpoint_count} tool${plugin.endpoint_count !== 1 ? 's' : ''}</span>${isBuiltin ? '' : '<span class="status-badge status-info" style="font-size:0.72rem; margin-left:6px;">custom</span>'}</h4>
-                <span class="expand-icon" id="plugin-chevron-${plugin.id}">▼</span>
+                <span class="integration-icon">${icon('puzzle')}</span>
+                <h4>${plugin.display_name}<span class="integration-subtitle">${authLabel} · ${plugin.endpoint_count} tool${plugin.endpoint_count !== 1 ? 's' : ''}</span>${isBuiltin ? '' : '<span class="badge badge-outline badge-sm">Custom</span>'}</h4>
+                <span class="expand-icon" id="plugin-chevron-${plugin.id}">${icon('chevron-down')}</span>
             </div>
             <label class="toggle-label" onclick="event.stopPropagation()">
                 <input type="checkbox" class="toggle-input" id="plugin-enabled-${plugin.id}"
@@ -2446,13 +2431,10 @@ async function loadPluginConfigValues(pluginId, configFields) {
 function togglePluginCard(pluginId) {
     const body = document.getElementById(`plugin-body-${pluginId}`);
     const chevron = document.getElementById(`plugin-chevron-${pluginId}`);
-    if (body.style.display === 'none') {
-        body.style.display = 'block';
-        chevron.textContent = '▲';
-    } else {
-        body.style.display = 'none';
-        chevron.textContent = '▼';
-    }
+    const expanded = body.style.display === 'none';
+    body.style.display = expanded ? 'block' : 'none';
+    if (chevron) chevron.classList.toggle('expanded', expanded);
+    body.closest('.integration-card')?.classList.toggle('is-expanded', expanded);
 }
 
 async function togglePlugin(pluginId, enabled) {
@@ -2502,13 +2484,13 @@ async function savePluginCredentials(pluginId) {
     try {
         await api.put(`/api/plugins/${pluginId}/credentials`, body);
         if (statusEl) {
-            statusEl.innerHTML = '<span class="text-success">✓ Saved</span>';
+            statusEl.innerHTML = `<span class="inline-status text-success">${icon('check')}Saved</span>`;
             setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
         }
         toast.success('Plugin credentials saved');
     } catch (error) {
         console.error('Failed to save plugin credentials:', error);
-        if (statusEl) statusEl.innerHTML = '<span class="text-error">✗ Save failed</span>';
+        if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}Save failed</span>`;
         toast.error('Failed to save credentials');
     }
 }
@@ -2520,15 +2502,15 @@ async function testPluginConnection(pluginId) {
     try {
         const result = await api.get(`/api/plugins/${pluginId}/test`);
         if (result.success) {
-            if (statusEl) statusEl.innerHTML = `<span class="text-success">✓ ${result.message}</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="inline-status text-success">${icon('check')}${result.message}</span>`;
             toast.success('Connection successful');
         } else {
-            if (statusEl) statusEl.innerHTML = `<span class="text-error">✗ ${result.message}</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}${result.message}</span>`;
             toast.error(`Connection failed: ${result.message}`);
         }
     } catch (error) {
         console.error('Plugin test failed:', error);
-        if (statusEl) statusEl.innerHTML = '<span class="text-error">✗ Test failed</span>';
+        if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}Test failed</span>`;
         toast.error('Connection test failed');
     }
 }

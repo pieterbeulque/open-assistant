@@ -105,7 +105,7 @@
                     <h3 class="section-title">LLM Configuration</h3>
                     <p class="text-muted">
                         Configure your LLM provider for AI-powered conversations.
-                        <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/integrations/llm-providers.md" target="_blank" class="help-link">How to get API credentials →</a>
+                        <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/integrations/llm-providers.md" target="_blank" class="help-link">How to get API credentials <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a>
                     </p>
                     <div id="llm-settings"></div>
                 </div>
@@ -242,7 +242,7 @@
                             <h3 class="section-title">Plugins</h3>
                             <p class="text-muted">
                                 Enable lightweight REST API integrations. Each plugin's endpoints are injected as LLM tools at runtime.
-                                <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/plugin-schema.md" target="_blank" class="help-link">How to write a plugin →</a>
+                                <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/plugin-schema.md" target="_blank" class="help-link">How to write a plugin <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a>
                             </p>
                         </div>
                         <button onclick="showAddPluginModal()" class="btn btn-secondary btn-sm"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>Add custom plugin</button>
@@ -292,12 +292,12 @@
         <div class="modal-content" style="max-width:680px;">
             <div class="modal-header">
                 <h2 id="plugin-modal-title">Install Custom Plugin</h2>
-                <button class="modal-close" onclick="closeAddPluginModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeAddPluginModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <p class="modal-hint">
                     Paste a plugin definition JSON below.
-                    <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/plugin-schema.md" target="_blank" class="help-link">View schema docs →</a>
+                    <a href="https://github.com/open-assistant-org/open-assistant/blob/main/docs/plugin-schema.md" target="_blank" class="help-link">View schema docs <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a>
                 </p>
                 <textarea id="plugin-json-input" class="form-textarea code-input" rows="18"
                     aria-label="Plugin definition JSON"
@@ -316,7 +316,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="integration-modal-title">Integration Settings</h2>
-                <button class="modal-close" onclick="closeIntegrationModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeIntegrationModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <div id="integration-modal-content"></div>
@@ -374,7 +374,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="agent-modal-title">Edit Agent</h2>
-                <button class="modal-close" onclick="closeAgentModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeAgentModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="agent-name">
@@ -424,7 +424,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Agent</h2>
-                <button class="modal-close" onclick="closeAddAgentModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeAddAgentModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -464,7 +464,7 @@
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
                 <h2>Add MCP Server</h2>
-                <button class="modal-close" onclick="closeAddMcpModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeAddMcpModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -547,7 +547,7 @@
         <div class="modal-content" style="max-width:540px;">
             <div class="modal-header">
                 <h2 id="mcp-creds-title">Update Credentials</h2>
-                <button class="modal-close" onclick="closeMcpCredentialsModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeMcpCredentialsModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <p class="modal-hint">
@@ -571,7 +571,7 @@
         <div class="modal-content" style="max-width:480px;">
             <div class="modal-header">
                 <h2>Edit MCP Server</h2>
-                <button class="modal-close" onclick="closeMcpEditModal()">&times;</button>
+                <button class="modal-close" aria-label="Close" onclick="closeMcpEditModal()"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="mcp-edit-server-id">

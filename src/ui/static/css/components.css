@@ -14,9 +14,11 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. ICON  (<svg class="icon"><use href="#icon-..."/></svg>, sprite in components.js)
+   1. ICON - Lucide (https://lucide.dev), sprite in components.js
+   <svg class="icon"><use href="#icon-name"></use></svg>  or  icon('name') in JS
    -------------------------------------------------------------------------- */
 .icon {
+    display: inline-block;
     width: 1.15em;
     height: 1.15em;
     flex-shrink: 0;
@@ -25,6 +27,11 @@
     stroke-width: 1.75;
     stroke-linecap: round;
     stroke-linejoin: round;
+    vertical-align: middle;
+}
+
+.icon-spin {
+    animation: spin 1s linear infinite;
 }
 
 .icon-sm { width: 16px; height: 16px; }
@@ -337,7 +344,7 @@ select.form-input {
     appearance: none;
     -webkit-appearance: none;
     padding-right: var(--space-8);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238e8e87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 16px;
@@ -380,6 +387,25 @@ select.form-input {
 .help-link:hover {
     color: var(--color-text);
     text-decoration-color: currentColor;
+}
+
+.help-link .icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* Short inline result, e.g. "Saved" next to a button */
+.inline-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+.inline-status .icon {
+    width: 15px;
+    height: 15px;
 }
 
 /* Range slider */
@@ -680,12 +706,8 @@ input[type="radio"] {
 /* Tones */
 .badge-success,
 .status-success,
-.status-enabled,
-.badge-running,
-.status-badge-enabled,
 .status-badge-completed,
 .status-badge-success,
-.status-badge-public,
 .session-badge-success {
     --_badge-bg: var(--color-success-bg);
     --_badge-fg: var(--color-success-fg);
@@ -694,9 +716,7 @@ input[type="radio"] {
 .badge-warning,
 .status-warning,
 .badge-pending,
-.status-badge-running,
-.session-badge-warning,
-.source-env {
+.session-badge-warning {
     --_badge-bg: var(--color-warning-bg);
     --_badge-fg: var(--color-warning-fg);
 }
@@ -712,31 +732,42 @@ input[type="radio"] {
 
 .badge-neutral,
 .status-info,
-.status-disabled,
-.badge-stopped,
-.badge-deleted,
 .badge-provisioning,
-.status-badge-disabled,
 .status-badge-cancelled,
 .status-badge-skipped,
-.status-badge-private,
 .status-badge-pending,
+.status-badge-running,
 .session-badge-neutral,
-.source-default {
+.source-default,
+.source-env {
     --_badge-bg: var(--color-neutral-bg);
     --_badge-fg: var(--color-neutral-fg);
 }
 
+/* "On" states (enabled, running, public) are states, not successes:
+   they stay monochrome and read as the stronger of the two neutrals. */
 .badge-accent,
+.badge-on,
+.status-enabled,
+.badge-running,
+.status-badge-enabled,
+.status-badge-public,
 .source-db {
     --_badge-bg: var(--color-accent-subtle);
     --_badge-fg: var(--color-text);
     --_badge-border: var(--color-border);
 }
 
-.badge-outline {
+/* "Off" states (disabled, private, stopped) */
+.badge-outline,
+.badge-off,
+.status-disabled,
+.badge-stopped,
+.badge-deleted,
+.status-badge-disabled,
+.status-badge-private {
     --_badge-bg: transparent;
-    --_badge-fg: var(--color-text-secondary);
+    --_badge-fg: var(--color-text-tertiary);
     --_badge-border: var(--color-border-strong);
 }
 
@@ -787,6 +818,8 @@ input[type="radio"] {
 }
 
 .alert > .icon {
+    width: 16px;
+    height: 16px;
     margin-top: 2px;
 }
 
@@ -978,6 +1011,12 @@ input[type="radio"] {
     line-height: 1;
     cursor: pointer;
     transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.modal-close .icon,
+.modal-close-btn .icon {
+    width: 18px;
+    height: 18px;
 }
 
 .modal-close:hover,

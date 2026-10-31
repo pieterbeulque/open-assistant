@@ -248,15 +248,16 @@ function renderAttachmentChips() {
         chip.className = 'attachment-chip' + (f.uploading ? ' uploading' : '');
         chip.title = f.filename;
 
-        const icon = document.createElement('span');
+        const fileIcon = document.createElement('span');
+        fileIcon.className = 'attachment-chip-icon';
         if (f.uploading) {
-            icon.textContent = '⏳';
+            fileIcon.innerHTML = icon('loader', 'icon-spin');
         } else if (f.image_base64) {
-            icon.textContent = '🖼️';
+            fileIcon.innerHTML = icon('image');
         } else if (f.ocr_text || f.content_type === 'application/pdf' || (f.filename && f.filename.toLowerCase().endsWith('.pdf'))) {
-            icon.textContent = '📑';
+            fileIcon.innerHTML = icon('file-text');
         } else {
-            icon.textContent = '📄';
+            fileIcon.innerHTML = icon('file');
         }
 
         const name = document.createElement('span');
@@ -269,7 +270,7 @@ function renderAttachmentChips() {
 
         const removeBtn = document.createElement('button');
         removeBtn.className = 'attachment-chip-remove';
-        removeBtn.textContent = '×';
+        removeBtn.innerHTML = icon('close');
         removeBtn.title = 'Remove attachment';
         removeBtn.setAttribute('aria-label', `Remove ${f.filename}`);
         removeBtn.addEventListener('click', () => {
@@ -277,7 +278,7 @@ function renderAttachmentChips() {
             renderAttachmentChips();
         });
 
-        chip.appendChild(icon);
+        chip.appendChild(fileIcon);
         chip.appendChild(name);
         if (!f.uploading) chip.appendChild(size);
         chip.appendChild(removeBtn);
@@ -671,7 +672,7 @@ function renderToolCallCard(container, event) {
     }
 
     card.innerHTML = `
-        <span class="tool-call-icon"><svg class="icon" aria-hidden="true"><use href="#icon-tool"></use></svg></span>
+        <span class="tool-call-icon">${icon('tool')}</span>
         <span class="tool-call-body">
             <span class="tool-call-name">${escapeHtml(event.tool)}</span>
             ${argsSummary ? `<div class="tool-call-args">${escapeHtml(argsSummary)}</div>` : ''}
@@ -691,12 +692,8 @@ function updateToolCallCard(container, event) {
     card.classList.remove('running');
     card.classList.add(event.success ? 'done' : 'failed');
 
-    const icon = card.querySelector('.tool-call-icon');
-    if (icon) {
-        icon.innerHTML = event.success
-            ? '<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>'
-            : '<svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>';
-    }
+    const statusIcon = card.querySelector('.tool-call-icon');
+    if (statusIcon) statusIcon.innerHTML = icon(event.success ? 'check' : 'close');
 
     const statusEl = card.querySelector('.tool-call-status');
     if (statusEl) statusEl.textContent = event.success ? 'done' : 'failed';
@@ -736,7 +733,7 @@ function addMessageToUI(content, role, attachments) {
         const banner = document.createElement('div');
         banner.className = 'attachment-banner';
         banner.innerHTML = attachments
-            .map(f => `📎 <strong>${escapeHtml(f.filename)}</strong> (${formatFileSize(f.size)})`)
+            .map(f => `${icon('paperclip')}<strong>${escapeHtml(f.filename)}</strong> (${formatFileSize(f.size)})`)
             .join('<br>');
         contentDiv.appendChild(banner);
     }
@@ -905,15 +902,16 @@ class ConversationHistoryManager {
 
         const title = document.createElement('h4');
         title.className = 'conversation-title';
-        title.textContent = conv.title || 'New Conversation';
+        title.textContent = conv.title || 'New conversation';
 
         const pinBtn = document.createElement('button');
         pinBtn.className = 'pin-button';
         if (conv.pinned) {
             pinBtn.classList.add('pinned');
         }
-        pinBtn.innerHTML = '★';
+        pinBtn.innerHTML = icon('pin');
         pinBtn.title = conv.pinned ? 'Unpin' : 'Pin';
+        pinBtn.setAttribute('aria-label', pinBtn.title);
         pinBtn.onclick = (e) => {
             e.stopPropagation();
             this.togglePin(conv.conversation_id);
