@@ -344,7 +344,8 @@ function renderField(setting) {
     // Store current value
     settingsState.currentValues[def.key] = value;
 
-    const sourceBadge = `<span class="setting-source source-${source}">${source.toUpperCase()}</span>`;
+    const SOURCE_LABELS = { db: 'Saved', env: 'Environment', default: 'Default' };
+    const sourceBadge = `<span class="setting-source source-${source}" title="Where this value comes from">${SOURCE_LABELS[source] || source}</span>`;
 
     let fieldHtml = '';
 
@@ -437,7 +438,7 @@ function renderTextInput(def, value) {
                 ${def.is_required ? 'required' : ''}
                 data-original-value="${value || ''}"
             >
-            ${isMasked ? `<button type="button" class="btn-icon" onclick="toggleMasked('${def.key}')">👁️</button>` : ''}
+            ${isMasked ? `<button type="button" class="btn-icon" onclick="toggleMasked('${def.key}')" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>` : ''}
         </div>
     `;
 }
@@ -704,41 +705,41 @@ async function createIntegrationCard(serviceName) {
                                      serviceName === 'google_ads' ? 'authenticateGoogleAds' :
                                      'authenticateOutlook';
             actionButtonsHtml = `
-                <button onclick="${authFunctionName}()" class="btn btn-primary">
-                    🔐 Authenticate ${serviceName.charAt(0).toUpperCase() + serviceName.slice(1)}
+                <button onclick="${authFunctionName}()" class="btn btn-secondary">
+                    Authenticate ${serviceName.charAt(0).toUpperCase() + serviceName.slice(1)}
                 </button>
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    🔍 Test Connection
+                    Test Connection
                 </button>
                 ${(!isManaged || managedFields.length === 0) ? `<button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    💾 Save Settings
+                    Save Settings
                 </button>` : ''}
             `;
         } else if (serviceName === 'whatsapp') {
             actionButtonsHtml = `
-                <button onclick="linkWhatsApp()" class="btn btn-primary">
-                    📱 Link WhatsApp
+                <button onclick="linkWhatsApp()" class="btn btn-secondary">
+                    Link WhatsApp
                 </button>
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    🔍 Test Connection
+                    Test Connection
                 </button>
                 <button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    💾 Save Settings
+                    Save Settings
                 </button>
             `;
         } else if (isNoConfigService) {
             actionButtonsHtml = `
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    🔍 Test Connection
+                    Test Connection
                 </button>
             `;
         } else {
             actionButtonsHtml = `
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    🔍 Test Connection
+                    Test Connection
                 </button>
                 ${!isManagedOnlyService ? `<button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    💾 Save Settings
+                    Save Settings
                 </button>` : ''}
             `;
         }
@@ -748,7 +749,7 @@ async function createIntegrationCard(serviceName) {
                 <div class="integration-title">
                     <span class="integration-icon">${getServiceIcon(serviceName)}</span>
                     <h4>${getServiceDisplayName(serviceName)}</h4>
-                    <span class="expand-icon">▼</span>
+                    <span class="expand-icon">${icon('chevron-down')}</span>
                 </div>
                 <label class="toggle-label" onclick="event.stopPropagation()">
                     <input
@@ -763,7 +764,7 @@ async function createIntegrationCard(serviceName) {
             <div class="integration-body" style="display: none;">
                 ${(!isManaged || managedFields.length === 0) && !isNoConfigService ? `<div class="integration-help">
                     <a href="${docUrl}" target="_blank" class="help-link">
-                        📚 How to get ${serviceName} credentials?
+                        How to get ${getServiceDisplayName(serviceName)} credentials ${icon('arrow-up-right')}
                     </a>
                 </div>` : ''}
                 <div class="integration-settings">
@@ -785,7 +786,7 @@ async function createIntegrationCard(serviceName) {
         card.innerHTML = `
             <div class="integration-header">
                 <div class="integration-title">
-                    <span class="integration-icon">⚠️</span>
+                    <span class="integration-icon">${icon('alert')}</span>
                     <h4>${getServiceDisplayName(serviceName)}</h4>
                 </div>
             </div>
@@ -797,25 +798,28 @@ async function createIntegrationCard(serviceName) {
     }
 }
 
+// Lucide icon per service (sprite ids in js/components.js)
+const SERVICE_ICON_NAMES = {
+    google: 'svc-google',
+    google_navigator: 'svc-map',
+    google_ads: 'svc-ads',
+    outlook: 'svc-mail',
+    notion: 'svc-notion',
+    nextcloud: 'svc-cloud',
+    whatsapp: 'svc-whatsapp',
+    slack: 'svc-slack',
+    brave: 'svc-search',
+    browser: 'svc-globe',
+    whisper: 'svc-mic',
+    mistral_ocr: 'svc-ocr',
+    toggl: 'svc-timer',
+    google_news: 'svc-news',
+    yahoo_finance: 'svc-finance',
+    system: 'svc-system',
+};
+
 function getServiceIcon(service) {
-    const icons = {
-        google: '🔵',
-        google_navigator: '🗺️',
-        google_ads: '📊',
-        outlook: '📨',
-        notion: '📝',
-        nextcloud: '☁️',
-        whatsapp: '💬',
-        slack: '📢',
-        brave: '🔎',
-        browser: '🌐',
-        whisper: '🎙️',
-        mistral_ocr: '🔍',
-        toggl: '⏱️',
-        google_news: '📰',
-        yahoo_finance: '📈'
-    };
-    return icons[service] || '🔧';
+    return icon(SERVICE_ICON_NAMES[service] || 'svc-plug');
 }
 
 function getServiceDisplayName(service) {
@@ -863,7 +867,7 @@ function renderConnectionStatus(hasCredentials, service) {
     if (hasCredentials) {
         return '<span class="status-badge status-success">Connected</span>';
     } else {
-        return '<span class="status-badge status-warning">Not Configured</span>';
+        return '<span class="status-badge status-disabled">Not configured</span>';
     }
 }
 
@@ -887,13 +891,10 @@ function toggleIntegrationExpanded(service) {
     const body = card.querySelector('.integration-body');
     const icon = card.querySelector('.expand-icon');
 
-    if (body.style.display === 'none') {
-        body.style.display = 'block';
-        icon.textContent = '▲';
-    } else {
-        body.style.display = 'none';
-        icon.textContent = '▼';
-    }
+    const expanded = body.style.display === 'none';
+    body.style.display = expanded ? 'block' : 'none';
+    if (icon) icon.classList.toggle('expanded', expanded);
+    card.classList.toggle('is-expanded', expanded);
 }
 
 async function saveIntegration(service) {
@@ -1079,17 +1080,17 @@ async function testLLMConnection() {
         const response = await api.post('/api/settings/test-llm');
 
         if (response.status === 'connected') {
-            resultDiv.innerHTML = `<p class="success">✅ Connection successful!</p>`;
+            resultDiv.innerHTML = `<p class="success">Connection successful</p>`;
         } else if (response.status === 'error') {
-            resultDiv.innerHTML = `<p class="error">❌ ${response.message}</p>`;
+            resultDiv.innerHTML = `<p class="error">${response.message}</p>`;
         } else {
-            resultDiv.innerHTML = `<p class="warning">⚠️ ${response.message}</p>`;
+            resultDiv.innerHTML = `<p class="warning">${response.message}</p>`;
         }
 
     } catch (error) {
         const resultDiv = document.getElementById('llm-test-result');
         resultDiv.style.display = 'block';
-        resultDiv.innerHTML = `<p class="error">❌ Test failed: ${error.message}</p>`;
+        resultDiv.innerHTML = `<p class="error">Test failed: ${error.message}</p>`;
     }
 }
 
@@ -1136,7 +1137,7 @@ async function loadAuditLog() {
                             <td>${entry.action}</td>
                             <td>
                                 <span class="status-badge ${entry.success ? 'status-success' : 'status-error'}">
-                                    ${entry.success ? '✅' : '❌'}
+                                    ${entry.success ? 'Success' : 'Failed'}
                                 </span>
                             </td>
                             <td>${entry.user_id || 'system'}</td>
@@ -1238,12 +1239,12 @@ function getStatusClass(status) {
 
 function getStatusText(status) {
     const map = {
-        'connected': '✓ Connected',
-        'expired': '⚠ Expired',
-        'error': '✗ Error',
-        'not_configured': '○ Not Configured'
+        'connected': 'Connected',
+        'expired': 'Expired',
+        'error': 'Error',
+        'not_configured': 'Not configured'
     };
-    return map[status] || '○ Unknown';
+    return map[status] || 'Unknown';
 }
 
 async function refreshConnectionStatus(service) {
@@ -1583,7 +1584,7 @@ async function testConnection(service) {
 
         // Show result
         if (response.status === 'connected' || response.status === 'success') {
-            toast.success(`✓ ${service} connection successful!`);
+            toast.success(`${service} connection successful`);
         } else if (response.status === 'warning') {
             // For warning status, show as info with better message
             toast.info(`${service}: Credentials configured. ${response.message}`);
@@ -1595,7 +1596,7 @@ async function testConnection(service) {
                 // Could open auth URL in popup if needed
             }
         } else if (response.status === 'error') {
-            toast.error(`✗ ${response.message}`);
+            toast.error(response.message);
         } else {
             toast.warning(`${service}: ${response.message || 'Unknown status'}`);
         }
@@ -1653,7 +1654,7 @@ function createAgentCard(agent, index, total) {
     }
 
     const toolsCount = agent.tools ? agent.tools.length : 0;
-    const statusClass = agent.enabled ? 'status-success' : 'status-warning';
+    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const isCoordinator = agent.name === 'coordinator';
 
@@ -1665,8 +1666,8 @@ function createAgentCard(agent, index, total) {
             <div class="agent-header">
                 <div class="agent-title">
                     <div class="agent-priority-controls">
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up">&#9650;</button>
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down">&#9660;</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up" aria-label="Move up">${icon('chevron-up')}</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down" aria-label="Move down">${icon('chevron-down')}</button>
                     </div>
                     <span class="agent-icon">${getAgentIcon(agent.name)}</span>
                     <div class="agent-info">
@@ -1708,7 +1709,7 @@ function createAgentCard(agent, index, total) {
 
 function createMcpAgentCard(agent, index, total) {
     const srv = (settingsState.mcpServers || {})[agent.name] || {};
-    const statusClass = agent.enabled ? 'status-success' : 'status-warning';
+    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const serverId = agent.name.slice('mcp_'.length);
     const authType = srv.auth_type || 'header';
@@ -1716,11 +1717,11 @@ function createMcpAgentCard(agent, index, total) {
     const keywords = (srv.intent_keywords || []).join(', ');
     const toolNames = srv.tool_names || [];
     const toolsHtml = toolNames.length
-        ? `<div style="margin-top:4px; font-size:0.82rem; color:var(--text-muted);">${toolNames.map(t => `<code>${escapeHtml(t)}</code>`).join(' ')}</div>`
+        ? `<div class="agent-tools">${toolNames.map(t => `<code>${escapeHtml(t)}</code>`).join(' ')}</div>`
         : '';
 
     const authBadge = authType === 'oauth2'
-        ? '<span class="meta-item" style="background:var(--accent-dim,#1a2a1a);color:var(--accent,#0f0);">OAuth 2.1</span>'
+        ? '<span class="meta-item">OAuth 2.1</span>'
         : authType === 'none'
             ? '<span class="meta-item">No auth</span>'
             : '<span class="meta-item">Static headers</span>';
@@ -1729,8 +1730,8 @@ function createMcpAgentCard(agent, index, total) {
     const oauthAuthorized = srv.oauth_authorized === true;
     const oauthStatusHtml = authType === 'oauth2'
         ? (oauthAuthorized
-            ? '<span class="meta-item text-success">✓ Authorized</span>'
-            : '<span class="meta-item text-warning">⚠ Not authorized</span>')
+            ? `<span class="meta-item text-success">${icon('check')}Authorized</span>`
+            : `<span class="meta-item text-warning">${icon('alert')}Not authorized</span>`)
         : '';
 
     const footerButtons = authType === 'oauth2'
@@ -1745,16 +1746,16 @@ function createMcpAgentCard(agent, index, total) {
     const downDisabled = index === total - 1 ? 'disabled' : '';
 
     return `
-        <div class="agent-card" id="agent-${agent.name}" style="border-left:3px solid var(--accent,#0f0);">
+        <div class="agent-card" id="agent-${agent.name}">
             <div class="agent-header">
                 <div class="agent-title">
                     <div class="agent-priority-controls">
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up">&#9650;</button>
-                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down">&#9660;</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'up')" ${upDisabled} title="Move up" aria-label="Move up">${icon('chevron-up')}</button>
+                        <button class="btn-priority" onclick="moveAgent('${agent.name}', 'down')" ${downDisabled} title="Move down" aria-label="Move down">${icon('chevron-down')}</button>
                     </div>
-                    <span class="agent-icon">${escapeHtml(srv.icon || '🔌')}</span>
+                    <span class="agent-icon">${icon('server')}</span>
                     <div class="agent-info">
-                        <h4>${escapeHtml(agent.display_name)} <span style="font-size:0.75rem;font-weight:normal;color:var(--text-muted);">MCP</span></h4>
+                        <h4>${escapeHtml(agent.display_name)} <span class="badge badge-outline badge-sm">MCP</span></h4>
                         <small class="text-muted" title="${escapeAttr(url)}">${escapeHtml(url.length > 60 ? url.slice(0,57)+'…' : url)}</small>
                     </div>
                 </div>
@@ -1776,7 +1777,7 @@ function createMcpAgentCard(agent, index, total) {
                     ${authBadge}
                     ${oauthStatusHtml}
                     <span class="meta-item">${toolNames.length} tool${toolNames.length !== 1 ? 's' : ''}</span>
-                    ${keywords ? `<span class="meta-item" title="Intent keywords">🔑 ${escapeHtml(keywords)}</span>` : ''}
+                    ${keywords ? `<span class="meta-item" title="Intent keywords">${escapeHtml(keywords)}</span>` : ''}
                 </div>
                 ${toolsHtml}
             </div>
@@ -1789,18 +1790,18 @@ function createMcpAgentCard(agent, index, total) {
 }
 
 function getAgentIcon(agentName) {
-    const icons = {
-        coordinator: '🎯',
-        research: '🔍',
-        communication: '📨',
-        planner: '📅',
-        browser: '🌐',
-        writer: '✍️',
-        file_handler: '📁',
-        system: '⚙️',
-        navigator: '🗺️'
+    const names = {
+        coordinator: 'agent-coordinator',
+        research: 'agent-research',
+        communication: 'agent-communication',
+        planner: 'agent-planner',
+        browser: 'agent-browser',
+        writer: 'agent-writer',
+        file_handler: 'agent-files',
+        system: 'agent-system',
+        navigator: 'agent-navigator',
     };
-    return icons[agentName] || '🤖';
+    return icon(names[agentName] || 'agent-default');
 }
 
 function escapeHtml(str) {
@@ -2092,20 +2093,6 @@ async function createNewAgent() {
 // TOOLS TAB - DRAG & DROP
 // ============================================================================
 
-const SERVICE_ICONS = {
-    google: '🔵',
-    google_navigator: '🗺️',
-    outlook: '📨',
-    notion: '📝',
-    nextcloud: '☁️',
-    whatsapp: '💬',
-    slack: '📢',
-    brave: '🔎',
-    browser: '🌐',
-    google_news: '📰',
-    system: '⚙️'
-};
-
 function escapeHtmlText(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -2148,21 +2135,21 @@ function getAllToolsFlat() {
 }
 
 function buildToolChip(tool) {
-    const icon = SERVICE_ICONS[tool.service] || '🔧';
+    const toolIcon = getServiceIcon(tool.service);
     const name = escapeAttr(tool.tool_name);
     const displayName = escapeHtmlText(tool.display_name);
     const description = escapeAttr(tool.description || '');
-    return `<div class="tool-chip" draggable="true" data-tool="${name}" title="${description}" ondragstart="onToolDragStart(event)">${icon} ${displayName}</div>`;
+    return `<div class="tool-chip" draggable="true" data-tool="${name}" title="${description}" ondragstart="onToolDragStart(event)"><span class="tool-chip-icon">${toolIcon}</span>${displayName}</div>`;
 }
 
-function buildDropZone(label, zoneId, tools) {
+function buildDropZone(label, zoneId, tools, iconHtml = '') {
     const chips = tools.map(t => buildToolChip(t)).join('');
     const escapedLabel = escapeHtmlText(label);
     const count = tools.length;
     return `
         <div class="tool-drop-zone" data-zone="${escapeAttr(zoneId)}"
              ondragover="onToolDragOver(event)" ondragleave="onToolDragLeave(event)" ondrop="onToolDrop(event)">
-            <div class="tool-zone-header">${escapedLabel} <span class="tool-zone-count">(${count})</span></div>
+            <div class="tool-zone-header">${iconHtml}${escapedLabel} <span class="tool-zone-count">${count}</span></div>
             <div class="tool-zone-body">${chips || '<span class="tool-zone-empty">Drop tools here</span>'}</div>
         </div>
     `;
@@ -2187,8 +2174,7 @@ function renderToolsDragDrop() {
 
     let html = buildDropZone('Unassigned', '__unassigned__', unassigned);
     for (const { agent, tools } of agentZones) {
-        const icon = getAgentIcon(agent.name);
-        html += buildDropZone(`${icon} ${agent.display_name}`, agent.name, tools);
+        html += buildDropZone(agent.display_name, agent.name, tools, getAgentIcon(agent.name));
     }
 
     container.innerHTML = html;
@@ -2298,7 +2284,7 @@ function createPluginCard(plugin) {
                 <div class="input-group">
                     <input type="password" id="plugin-token-${plugin.id}" class="form-input masked-input"
                         placeholder="Enter token..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
-                    <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon">👁️</button>
+                    <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                 </div>
             </div>`;
     } else if (plugin.auth_type === 'basic') {
@@ -2310,7 +2296,7 @@ function createPluginCard(plugin) {
                     <div class="input-group">
                         <input type="password" id="plugin-token-${plugin.id}" class="form-input masked-input"
                             placeholder="Enter API token..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
-                        <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon">👁️</button>
+                        <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                     </div>
                 </div>`;
         } else {
@@ -2321,14 +2307,14 @@ function createPluginCard(plugin) {
                     <div class="input-group">
                         <input type="password" id="plugin-token-${plugin.id}" class="form-input masked-input"
                             placeholder="Enter username..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
-                        <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon">👁️</button>
+                        <button type="button" onclick="toggleMasked('plugin-token-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                     </div>
                 </div>
                 <div class="form-group" id="plugin-password-group-${plugin.id}">
                     <label class="form-label">Password <span class="text-muted">(leave blank to keep existing)</span></label>
                     <div class="input-group">
                         <input type="password" id="plugin-password-${plugin.id}" class="form-input masked-input" placeholder="Enter password...">
-                        <button type="button" onclick="toggleMasked('plugin-password-${plugin.id}')" class="btn-icon">👁️</button>
+                        <button type="button" onclick="toggleMasked('plugin-password-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                     </div>
                 </div>`;
         }
@@ -2340,7 +2326,7 @@ function createPluginCard(plugin) {
                 <div class="input-group">
                     <input type="password" id="plugin-apikey-${plugin.id}" class="form-input masked-input"
                         placeholder="Enter API key..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
-                    <button type="button" onclick="toggleMasked('plugin-apikey-${plugin.id}')" class="btn-icon">👁️</button>
+                    <button type="button" onclick="toggleMasked('plugin-apikey-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                 </div>
             </div>
             <div class="form-group">
@@ -2354,7 +2340,7 @@ function createPluginCard(plugin) {
                 <label class="form-label">Password <span class="text-muted">(leave blank to keep existing)</span></label>
                 <div class="input-group">
                     <input type="password" id="plugin-password-${plugin.id}" class="form-input masked-input" placeholder="Enter password...">
-                    <button type="button" onclick="toggleMasked('plugin-password-${plugin.id}')" class="btn-icon">👁️</button>
+                    <button type="button" onclick="toggleMasked('plugin-password-${plugin.id}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                 </div>
             </div>`;
     }
@@ -2381,7 +2367,7 @@ function createPluginCard(plugin) {
                         <input type="password" id="${inputId}" class="form-input masked-input"
                             placeholder="${field.placeholder || ''}" data-config-key="${field.key}"
                             value="${plugin.has_credentials ? '***MASKED***' : ''}">
-                        <button type="button" onclick="toggleMasked('${inputId}')" class="btn-icon">👁️</button>
+                        <button type="button" onclick="toggleMasked('${inputId}')" class="btn-icon" title="Show or hide value" aria-label="Show or hide value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
                     </div>
                     ${field.description ? `<div class="form-hint">${field.description}</div>` : ''}
                 </div>`;
@@ -2393,9 +2379,9 @@ function createPluginCard(plugin) {
     card.innerHTML = `
         <div class="integration-header" onclick="togglePluginCard('${plugin.id}')">
             <div class="integration-title">
-                <span class="integration-icon">${plugin.icon}</span>
-                <h4>${plugin.display_name}<span class="text-muted" style="font-size:0.82rem; margin-left:8px; font-weight:400;">${authLabel} · ${plugin.endpoint_count} tool${plugin.endpoint_count !== 1 ? 's' : ''}</span>${isBuiltin ? '' : '<span class="status-badge status-info" style="font-size:0.72rem; margin-left:6px;">custom</span>'}</h4>
-                <span class="expand-icon" id="plugin-chevron-${plugin.id}">▼</span>
+                <span class="integration-icon">${icon('puzzle')}</span>
+                <h4>${plugin.display_name}<span class="integration-subtitle">${authLabel} · ${plugin.endpoint_count} tool${plugin.endpoint_count !== 1 ? 's' : ''}</span>${isBuiltin ? '' : '<span class="badge badge-outline badge-sm">Custom</span>'}</h4>
+                <span class="expand-icon" id="plugin-chevron-${plugin.id}">${icon('chevron-down')}</span>
             </div>
             <label class="toggle-label" onclick="event.stopPropagation()">
                 <input type="checkbox" class="toggle-input" id="plugin-enabled-${plugin.id}"
@@ -2411,10 +2397,10 @@ function createPluginCard(plugin) {
             ${configFieldsHtml}
 
             <div class="integration-actions">
-                <button onclick="savePluginCredentials('${plugin.id}')" class="btn btn-primary">💾 Save</button>
-                <button onclick="testPluginConnection('${plugin.id}')" class="btn btn-secondary">🔍 Test Connection</button>
-                ${!isBuiltin ? `<button onclick="showEditPluginModal('${plugin.id}')" class="btn btn-secondary">✏️ Edit JSON</button>` : ''}
-                ${!isBuiltin ? `<button onclick="deletePlugin('${plugin.id}')" class="btn btn-danger">🗑 Delete</button>` : ''}
+                <button onclick="savePluginCredentials('${plugin.id}')" class="btn btn-primary">Save</button>
+                <button onclick="testPluginConnection('${plugin.id}')" class="btn btn-secondary">Test Connection</button>
+                ${!isBuiltin ? `<button onclick="showEditPluginModal('${plugin.id}')" class="btn btn-secondary">Edit JSON</button>` : ''}
+                ${!isBuiltin ? `<button onclick="deletePlugin('${plugin.id}')" class="btn btn-danger">Delete</button>` : ''}
             </div>
             <div id="plugin-status-${plugin.id}" style="margin-top:8px;"></div>
         </div>`;
@@ -2445,13 +2431,10 @@ async function loadPluginConfigValues(pluginId, configFields) {
 function togglePluginCard(pluginId) {
     const body = document.getElementById(`plugin-body-${pluginId}`);
     const chevron = document.getElementById(`plugin-chevron-${pluginId}`);
-    if (body.style.display === 'none') {
-        body.style.display = 'block';
-        chevron.textContent = '▲';
-    } else {
-        body.style.display = 'none';
-        chevron.textContent = '▼';
-    }
+    const expanded = body.style.display === 'none';
+    body.style.display = expanded ? 'block' : 'none';
+    if (chevron) chevron.classList.toggle('expanded', expanded);
+    body.closest('.integration-card')?.classList.toggle('is-expanded', expanded);
 }
 
 async function togglePlugin(pluginId, enabled) {
@@ -2501,13 +2484,13 @@ async function savePluginCredentials(pluginId) {
     try {
         await api.put(`/api/plugins/${pluginId}/credentials`, body);
         if (statusEl) {
-            statusEl.innerHTML = '<span class="text-success">✓ Saved</span>';
+            statusEl.innerHTML = `<span class="inline-status text-success">${icon('check')}Saved</span>`;
             setTimeout(() => { statusEl.innerHTML = ''; }, 3000);
         }
         toast.success('Plugin credentials saved');
     } catch (error) {
         console.error('Failed to save plugin credentials:', error);
-        if (statusEl) statusEl.innerHTML = '<span class="text-error">✗ Save failed</span>';
+        if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}Save failed</span>`;
         toast.error('Failed to save credentials');
     }
 }
@@ -2519,15 +2502,15 @@ async function testPluginConnection(pluginId) {
     try {
         const result = await api.get(`/api/plugins/${pluginId}/test`);
         if (result.success) {
-            if (statusEl) statusEl.innerHTML = `<span class="text-success">✓ ${result.message}</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="inline-status text-success">${icon('check')}${result.message}</span>`;
             toast.success('Connection successful');
         } else {
-            if (statusEl) statusEl.innerHTML = `<span class="text-error">✗ ${result.message}</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}${result.message}</span>`;
             toast.error(`Connection failed: ${result.message}`);
         }
     } catch (error) {
         console.error('Plugin test failed:', error);
-        if (statusEl) statusEl.innerHTML = '<span class="text-error">✗ Test failed</span>';
+        if (statusEl) statusEl.innerHTML = `<span class="inline-status text-error">${icon('circle-x')}Test failed</span>`;
         toast.error('Connection test failed');
     }
 }
@@ -2704,7 +2687,7 @@ function addMcpHeaderRow(name = '', value = '') {
             value="${escapeAttr(name)}" style="flex:1;">
         <input type="password" class="form-input mcp-header-value" placeholder="Value"
             value="${escapeAttr(value)}" style="flex:1;">
-        <button type="button" class="btn-icon" onclick="this.parentElement.remove()">🗑️</button>`;
+        <button type="button" class="btn-icon" onclick="this.parentElement.remove()" title="Remove header" aria-label="Remove header"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>`;
     list.appendChild(row);
 }
 
@@ -2931,7 +2914,7 @@ const browserSessionsState = { sessions: [], replacingId: null };
 function renderBrowserSessionsSkeleton() {
     return `
         <div class="browser-sessions" id="browser-sessions">
-            <h5>🔐 Authenticated sessions</h5>
+            <h5>Authenticated sessions</h5>
             <p class="browser-sessions-help">
                 Let the browser use your own logged-in accounts. Paste a cookie export below; it is stored
                 encrypted and injected into the browser behind the scenes. The AI can use the logged-in
@@ -2942,7 +2925,7 @@ function renderBrowserSessionsSkeleton() {
                 <p class="text-muted">Loading…</p>
             </div>
             <details class="browser-session-add" id="browser-session-add">
-                <summary id="browser-session-add-summary">➕ Add a session</summary>
+                <summary id="browser-session-add-summary">Add a session</summary>
                 <div class="form-group">
                     <label for="bs-name">Name</label>
                     <input type="text" id="bs-name" class="form-input" maxlength="64" placeholder="e.g. Personal Gmail" autocomplete="off">
@@ -2975,7 +2958,7 @@ function renderBrowserSessionsSkeleton() {
                     Keep refreshed: save cookies the site renews while the browser is in use
                 </label>
                 <div class="browser-session-add-actions">
-                    <button class="btn btn-primary" id="bs-save" onclick="saveBrowserSession()">💾 Save session</button>
+                    <button class="btn btn-primary" id="bs-save" onclick="saveBrowserSession()">Save session</button>
                     <button class="btn btn-secondary" id="bs-cancel" style="display:none;" onclick="resetBrowserSessionForm()">Cancel</button>
                 </div>
             </details>
@@ -3035,9 +3018,9 @@ function renderBrowserSessions() {
                         onchange="updateBrowserSession('${id}', {enabled: this.checked})"> Enabled</label>
                     <label class="session-check" title="Save cookies the site renews while the browser is in use"><input type="checkbox" ${s.persist_updates ? 'checked' : ''}
                         onchange="updateBrowserSession('${id}', {persist_updates: this.checked})"> Keep refreshed</label>
-                    <button class="btn btn-secondary btn-sm" onclick="testBrowserSession('${id}')">🔍 Test</button>
-                    <button class="btn btn-secondary btn-sm" onclick="startReplaceBrowserSession('${id}')">♻️ Replace</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteBrowserSession('${id}')">🗑️ Delete</button>
+                    <button class="btn btn-secondary btn-sm" onclick="testBrowserSession('${id}')">Test</button>
+                    <button class="btn btn-secondary btn-sm" onclick="startReplaceBrowserSession('${id}')">Replace</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteBrowserSession('${id}')">Delete</button>
                 </div>
             </div>`;
     }).join('');
@@ -3075,9 +3058,9 @@ function resetBrowserSessionForm() {
     document.getElementById('bs-persist').checked = true;
     document.getElementById('bs-persist').disabled = false;
     document.getElementById('bs-file').value = '';
-    document.getElementById('bs-save').textContent = '💾 Save session';
+    document.getElementById('bs-save').textContent = 'Save session';
     document.getElementById('bs-cancel').style.display = 'none';
-    document.getElementById('browser-session-add-summary').textContent = '➕ Add a session';
+    document.getElementById('browser-session-add-summary').textContent = 'Add a session';
     document.getElementById('browser-session-add').open = false;
     onBrowserSessionFormatChange();
 }
@@ -3092,9 +3075,9 @@ function startReplaceBrowserSession(id) {
     name.disabled = true;
     document.getElementById('bs-persist').checked = s.persist_updates;
     document.getElementById('bs-persist').disabled = true;
-    document.getElementById('bs-save').textContent = '♻️ Replace cookies';
+    document.getElementById('bs-save').textContent = 'Replace cookies';
     document.getElementById('bs-cancel').style.display = 'inline-block';
-    document.getElementById('browser-session-add-summary').textContent = `♻️ Replace cookies for “${s.name}”`;
+    document.getElementById('browser-session-add-summary').textContent = `Replace cookies for “${s.name}”`;
     const details = document.getElementById('browser-session-add');
     details.open = true;
     details.scrollIntoView({ behavior: 'smooth', block: 'center' });
