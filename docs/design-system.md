@@ -130,7 +130,7 @@ Viewport media queries are for page chrome only: navigation, sidebars, page padd
 - **Delete and remove** are always a square trash icon button in the shaded red `.btn-danger` style, never a text button. Use `trashButton(onclick, label)` from `js/components.js`; the label becomes the tooltip and accessible name. Inside tables pass `'job-action-btn'` as the third argument.
 - **Destructive confirmations** (the "Delete", "Reset" or "Stop" button inside a confirm dialog) use the solid red `.btn-destructive`. Ask with `await modal.ask(title, message, { confirmText, danger: true })` instead of `window.confirm()`.
 - **Icon buttons are square.** `.btn-icon` is 40×40 (32×32 with `.btn-sm`, 44×44 on touch screens). Combine it with a variant (`.btn .btn-danger .btn-icon`) to keep that variant's colours.
-- **Button groups are right-aligned**: modal footers, card footers, `.btn-row`, `.settings-actions` and table row actions. In tables the last column fills the remaining width and its actions sit flush right; wide tables scroll horizontally inside `.table-scroll` / `.jobs-table-wrap`.
+- **Button groups are right-aligned**: modal footers, card footers, `.btn-row`, `.settings-actions` and table row actions. In tables the last column fills the remaining width and its actions sit flush right; wide tables scroll horizontally inside `.table-scroll` / `.jobs-table-wrap`. The actions column header is screen-reader only (`<th><span class="sr-only">Actions</span></th>`), and a stacked card shows its actions without a label.
 
 ## Icons
 
