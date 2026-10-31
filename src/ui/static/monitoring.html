@@ -680,9 +680,17 @@
                                 <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
                                 <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
                                 <td data-label="Status">
-                                    <span class="badge ${job.enabled ? 'badge-on' : 'badge-off'}">
-                                        ${job.enabled ? 'Enabled' : 'Disabled'}
-                                    </span>
+                                    <label class="toggle-label">
+                                        <input
+                                            type="checkbox"
+                                            class="toggle-input"
+                                            aria-label="Enable ${escapeHtml(job.name)}"
+                                            ${job.enabled ? 'checked' : ''}
+                                            onchange="toggleCronJob('${job.job_id}', this)"
+                                        >
+                                        <span class="toggle-slider"></span>
+                                        <span class="toggle-text">${job.enabled ? 'Enabled' : 'Disabled'}</span>
+                                    </label>
                                 </td>
                                 <td data-label="Last run">${job.last_run_at ? formatDateTime(job.last_run_at) : 'Never'}</td>
                                 <td data-label="Next run">${job.next_run_at ? formatDateTime(job.next_run_at) : 'N/A'}</td>
@@ -691,9 +699,6 @@
                                         <button class="job-action-btn job-action-icon" onclick="openRecipeGraphModal('${job.job_id}')" title="View recipe flow" aria-label="View recipe flow">${icon('workflow')}</button>
                                         <button class="job-action-btn" onclick="openEditPromptModal('${job.job_id}')">
                                             Edit recipe
-                                        </button>
-                                        <button class="job-action-btn" onclick="toggleCronJob('${job.job_id}', ${!job.enabled})">
-                                            ${job.enabled ? 'Disable' : 'Enable'}
                                         </button>
                                         <button class="job-action-btn" onclick="runCronJobNow('${job.job_id}')">
                                             Run now
@@ -711,7 +716,11 @@
             container.innerHTML = `<div class="jobs-table-wrap">${html}</div>`;
         }
 
-        async function toggleCronJob(jobId, enabled) {
+        async function toggleCronJob(jobId, input) {
+            const enabled = input.checked;
+            const text = input.parentElement.querySelector('.toggle-text');
+            input.disabled = true;
+            text.textContent = enabled ? 'Enabled' : 'Disabled';
             try {
                 await api.post(`/api/cron-jobs/${jobId}/toggle?enabled=${enabled}`);
                 toast.success(`Cron job ${enabled ? 'enabled' : 'disabled'}`);
@@ -719,6 +728,10 @@
             } catch (error) {
                 console.error('Failed to toggle cron job:', error);
                 toast.error('Failed to toggle cron job');
+                // Put the switch back where the server still has it.
+                input.checked = !enabled;
+                text.textContent = !enabled ? 'Enabled' : 'Disabled';
+                input.disabled = false;
             }
         }
 
