@@ -1412,10 +1412,6 @@
         flex-direction: column;
     }
 
-    .agent-header {
-        flex-wrap: wrap;
-    }
-
     .agent-body {
         padding-left: var(--space-5);
     }

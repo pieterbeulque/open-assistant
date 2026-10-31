@@ -47,12 +47,6 @@
     gap: var(--space-2);
 }
 
-/* A solid glyph reads heavier than outline icons: match the label size */
-.job-run-btn .icon {
-    width: 12px;
-    height: 12px;
-}
-
 /* "Run now" sits with the other row actions on desktop... */
 @container table (min-width: 641px) {
     .job-name .job-run-btn {
@@ -60,19 +54,9 @@
     }
 }
 
-/* ...and on phones it moves to the card's first row: the job name (no
-   label) on the left, "Run now" on the right, above the Enabled switch
-   that comes first on desktop. */
+/* ...and on phones it moves to the card's first row (the name cell, see
+   components.css): the job name on the left, "Run now" on the right. */
 @container table (max-width: 640px) {
-    .jobs-table tr:has(> .job-name-cell) {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .jobs-table .job-name-cell {
-        order: -1;
-    }
-
     .job-name {
         flex: 1;
         justify-content: space-between;

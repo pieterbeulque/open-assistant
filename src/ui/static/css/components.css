@@ -1259,6 +1259,12 @@ input[type="radio"] {
     padding: 0;
 }
 
+/* A solid glyph reads heavier than outline icons: match the label size */
+.job-action-btn .icon-filled {
+    width: 12px;
+    height: 12px;
+}
+
 .job-action-icon .icon {
     width: 14px;
     height: 14px;
@@ -1334,6 +1340,21 @@ input[type="radio"] {
     }
 
     .jobs-table td[colspan] {
+        text-align: left;
+    }
+
+    /* A cell without data-label is the row's name: in the card it is the
+       first row, with no label, even when a column (e.g. an Enabled
+       switch) comes before it on desktop. */
+    .table-stack tr:has(> td:not([data-label])),
+    .jobs-table tr:has(> td:not([data-label])) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-stack td:not([data-label]),
+    .jobs-table td:not([data-label]) {
+        order: -1;
         text-align: left;
     }
 

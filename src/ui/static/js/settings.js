@@ -1653,8 +1653,6 @@ function createAgentCard(agent, index, total) {
     }
 
     const toolsCount = agent.tools ? agent.tools.length : 0;
-    const statusClass = agent.enabled ? 'badge-on' : 'badge-off';
-    const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const isCoordinator = agent.name === 'coordinator';
 
     const upDisabled = index === 0 ? 'disabled' : '';
@@ -1675,11 +1673,11 @@ function createAgentCard(agent, index, total) {
                     </div>
                 </div>
                 <div class="agent-actions">
-                    <span class="badge ${statusClass}">${statusText}</span>
                     <label class="toggle-label" ${isCoordinator ? 'title="Coordinator cannot be disabled"' : ''}>
                         <input
                             type="checkbox"
                             class="toggle-input"
+                            aria-label="Enable ${escapeAttr(agent.display_name)}"
                             ${agent.enabled ? 'checked' : ''}
                             ${isCoordinator ? 'disabled' : ''}
                             onchange="toggleAgent('${agent.name}', this.checked)"
@@ -1708,8 +1706,6 @@ function createAgentCard(agent, index, total) {
 
 function createMcpAgentCard(agent, index, total) {
     const srv = (settingsState.mcpServers || {})[agent.name] || {};
-    const statusClass = agent.enabled ? 'badge-on' : 'badge-off';
-    const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const serverId = agent.name.slice('mcp_'.length);
     const authType = srv.auth_type || 'header';
     const url = srv.url || '';
@@ -1759,11 +1755,11 @@ function createMcpAgentCard(agent, index, total) {
                     </div>
                 </div>
                 <div class="agent-actions">
-                    <span class="badge ${statusClass}">${statusText}</span>
                     <label class="toggle-label">
                         <input
                             type="checkbox"
                             class="toggle-input"
+                            aria-label="Enable ${escapeAttr(agent.display_name)}"
                             ${agent.enabled ? 'checked' : ''}
                             onchange="toggleMcpServer('${escapeAttr(serverId)}', this.checked)"
                         >

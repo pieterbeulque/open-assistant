@@ -123,14 +123,16 @@
                 const secretLabel = a.has_secret ? 'Passphrase' : 'Set passphrase';
                 return `
                     <tr>
-                        <td data-label="Name">
-                            <div class="artifact-name">${escapeHtml(name)}</div>
-                            ${a.title ? `<div class="artifact-file">${escapeHtml(a.filename)}</div>` : ''}
+                        <td>
+                            <div>
+                                <div class="artifact-name">${escapeHtml(name)}</div>
+                                ${a.title ? `<div class="artifact-file">${escapeHtml(a.filename)}</div>` : ''}
+                            </div>
                         </td>
                         <td data-label="Type">${escapeHtml(shortType(a.mime_type))}</td>
                         <td data-label="Size">${formatSize(a.size)}</td>
                         <td data-label="Visibility">
-                            <span class="badge ${visClass}">${visLabel}</span>${lock}
+                            <span><span class="badge ${visClass}">${visLabel}</span>${lock}</span>
                         </td>
                         <td data-label="Created">${a.created_at ? formatDateTime(a.created_at) : '—'}</td>
                         <td data-label="Actions">

@@ -99,7 +99,7 @@ All components live in `css/components.css`. Variants only set private custom pr
 | Badge | `.badge` + `.badge-{success,warning,danger,neutral}` for outcomes, `.badge-on` / `.badge-off` for states, `.badge-outline`, `.badge-sm`; optional `.status-dot` inside. For job and run statuses use `statusBadgeClass(status)` from `js/components.js`. |
 | Alert | `.alert` (info, neutral) + `.alert-{success,warning,danger}` |
 | Tabs | `.tabs` > `button.tab(.active)`, a segmented control |
-| Table | `.table` (or legacy `.jobs-table`); add `.table-stack` + `data-label` on cells to stack into cards on phones |
+| Table | `.table` (or legacy `.jobs-table`); add `.table-stack` + `data-label` on cells to stack into cards on phones. Leave `data-label` off the name cell: in the card it becomes the first row, without a label. An on/off state is a switch in the first column (header `<span class="sr-only">Enabled</span>`), not a status badge plus an Enable/Disable button |
 | Modal | `.modal` > `.modal-content` > `.modal-header` / `.modal-body` / `.modal-footer`; `ModalManager` in `common.js` produces the same look |
 | Toast | `toast.success()` / `.error()` / `.warning()` / `.info()` from `common.js` |
 | Feedback | `.spinner`, `.skeleton`, `.empty-state` |
