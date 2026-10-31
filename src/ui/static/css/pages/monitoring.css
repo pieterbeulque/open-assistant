@@ -36,26 +36,30 @@
     overflow: hidden;
 }
 
-/* Tighter inner cells so wide job rows fit before they need to scroll */
-.jobs-table th,
-.jobs-table td {
-    padding-left: var(--space-3);
-    padding-right: var(--space-3);
-}
-
 .jobs-table .cell-sub {
     color: var(--color-text-tertiary);
     font-size: var(--text-xs);
 }
 
-.jobs-table th:first-child,
-.jobs-table td:first-child {
-    padding-left: var(--space-6);
-}
+/* Tighter inner cells so wide job rows fit before they need to scroll.
+   Only while the table is a table: once it stacks into cards (see
+   components.css), every cell keeps the same zero side padding. */
+@container table (min-width: 641px) {
+    .jobs-table th,
+    .jobs-table td {
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
+    }
 
-.jobs-table th:last-child,
-.jobs-table td:last-child {
-    padding-right: var(--space-6);
+    .jobs-table th:first-child,
+    .jobs-table td:first-child {
+        padding-left: var(--space-6);
+    }
+
+    .jobs-table th:last-child,
+    .jobs-table td:last-child {
+        padding-right: var(--space-6);
+    }
 }
 
 .jobs-table th {
@@ -652,13 +656,6 @@
         overflow: visible;
     }
 
-    .jobs-table th:first-child,
-    .jobs-table td:first-child,
-    .jobs-table th:last-child,
-    .jobs-table td:last-child {
-        padding-left: 0;
-        padding-right: 0;
-    }
 }
 
 /* Lucide icons inside graph chips, badges and node titles */

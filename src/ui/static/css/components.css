@@ -1324,8 +1324,16 @@ input[type="radio"] {
         text-align: left;
     }
 
+    /* An actions cell needs no "Actions" label: the buttons speak for
+       themselves and get the full width of the card. */
+    .table-stack td:has(> .row-actions, > .job-actions)::before,
+    .jobs-table td:has(> .row-actions, > .job-actions)::before {
+        content: none;
+    }
+
     .job-actions,
     .row-actions {
+        flex: 1;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
