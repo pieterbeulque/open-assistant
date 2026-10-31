@@ -783,6 +783,17 @@
             }
         }
 
+        // A future task either calls one tool directly or sends a prompt to
+        // the assistant (services/future_task.py accepts only these two).
+        const FUTURE_TASK_TYPE_LABELS = {
+            tool: 'Run a tool',
+            prompt: 'Ask the assistant',
+        };
+
+        function futureTaskTypeLabel(jobType) {
+            return FUTURE_TASK_TYPE_LABELS[jobType] || escapeHtml(jobType || 'Unknown');
+        }
+
         function renderFutureTasks() {
             const container = document.getElementById('futureTasks');
 
@@ -807,7 +818,7 @@
                             <tr>
                                 <td><strong>${escapeHtml(task.name)}</strong></td>
                                 <td data-label="Scheduled time">${formatDateTime(task.scheduled_time)}</td>
-                                <td data-label="Type">${escapeHtml(task.job_type || 'unknown')}</td>
+                                <td data-label="Type">${futureTaskTypeLabel(task.job_type)}</td>
                                 <td data-label="Status">
                                     <span class="${statusBadgeClass(task.status)}">
                                         ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
