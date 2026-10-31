@@ -36,10 +36,9 @@
     overflow: hidden;
 }
 
-/* Secondary detail inline after a cell's value, e.g. "2 steps · 1 pinned".
-   Kept on the same line so every cell in a row shares one baseline. */
 .jobs-table .cell-sub {
     color: var(--color-text-tertiary);
+    font-size: var(--text-xs);
 }
 
 /* Job name with its "Run now" play button right after it */
