@@ -1158,6 +1158,14 @@ input[type="radio"] {
     vertical-align: middle;
 }
 
+/* A switch on its own in a cell: as a block it centres with the rest of
+   the row (inline, it sits on the text baseline and rides ~3px high). */
+.table td > .toggle-label,
+.jobs-table td > .toggle-label {
+    display: flex;
+    width: fit-content;
+}
+
 .table tr:last-child td,
 .jobs-table tr:last-child td,
 .audit-table tr:last-child td,

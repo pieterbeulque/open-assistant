@@ -695,7 +695,7 @@
                                     </div>
                                 </td>
                                 <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
-                                <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
+                                <td data-label="Steps"><span>${stepLabel}${pinnedCount > 0 ? ` <span class="cell-sub">· ${pinnedCount} pinned</span>` : ''}</span></td>
                                 <td data-label="Last run">${job.last_run_at ? formatDateTime(job.last_run_at) : 'Never'}</td>
                                 <td data-label="Next run">${job.next_run_at ? formatDateTime(job.next_run_at) : 'N/A'}</td>
                                 <td data-label="Actions">
