@@ -41,6 +41,26 @@
     font-size: var(--text-xs);
 }
 
+/* Job name with its "Run now" play button right after it */
+.job-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* Stacked into cards, the name is the card's first row (no label),
+   above the Enabled switch that comes first on desktop. */
+@container table (max-width: 640px) {
+    .jobs-table tr:has(> .job-name-cell) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .jobs-table .job-name-cell {
+        order: -1;
+    }
+}
+
 /* Tighter inner cells so wide job rows fit before they need to scroll.
    Only while the table is a table: once it stacks into cards (see
    components.css), every cell keeps the same zero side padding. */

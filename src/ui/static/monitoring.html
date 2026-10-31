@@ -688,7 +688,12 @@
                                         <span class="toggle-slider"></span>
                                     </label>
                                 </td>
-                                <td data-label="Name"><strong>${escapeHtml(job.name)}</strong></td>
+                                <td class="job-name-cell">
+                                    <div class="job-name">
+                                        <strong>${escapeHtml(job.name)}</strong>
+                                        <button class="job-action-btn job-action-icon" onclick="runCronJobNow('${job.job_id}')" title="Run now" aria-label="Run ${escapeHtml(job.name)} now">${icon('play')}</button>
+                                    </div>
+                                </td>
                                 <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
                                 <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
                                 <td data-label="Last run">${job.last_run_at ? formatDateTime(job.last_run_at) : 'Never'}</td>
@@ -700,9 +705,6 @@
                                         </button>
                                         <button class="job-action-btn" onclick="openEditPromptModal('${job.job_id}')">
                                             Edit recipe
-                                        </button>
-                                        <button class="job-action-btn" onclick="runCronJobNow('${job.job_id}')">
-                                            Run now
                                         </button>
                                         ${trashButton(`deleteCronJob('${job.job_id}')`, 'Delete cron job', 'job-action-btn')}
                                     </div>
