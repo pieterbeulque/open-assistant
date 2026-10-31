@@ -121,7 +121,7 @@
     .sidebar-filters select,
     #messageInput {
         min-height: 44px;
-        font-size: 16px;
+        font-size: var(--text-md); /* 16px: stops iOS zooming on focus */
     }
 
     .form-textarea,

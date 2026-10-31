@@ -114,7 +114,7 @@
 
             const rows = artifactsState.map(a => {
                 const name = a.title || a.filename;
-                const visClass = a.is_public ? 'status-badge-public' : 'status-badge-private';
+                const visClass = a.is_public ? 'badge-on' : 'badge-off';
                 const visLabel = a.is_public ? 'Public' : 'Private';
                 const lock = a.has_secret
                     ? '<span class="lock-badge" title="Passphrase protected" aria-label="Passphrase protected"><svg class="icon" aria-hidden="true"><use href="#icon-lock"></use></svg></span>' : '';
@@ -130,15 +130,15 @@
                         <td data-label="Type">${escapeHtml(shortType(a.mime_type))}</td>
                         <td data-label="Size">${formatSize(a.size)}</td>
                         <td data-label="Visibility">
-                            <span class="status-badge-inline ${visClass}">${visLabel}</span>${lock}
+                            <span class="badge ${visClass}">${visLabel}</span>${lock}
                         </td>
                         <td data-label="Created">${a.created_at ? formatDateTime(a.created_at) : '—'}</td>
                         <td data-label="Actions">
                             <div class="job-actions">
                                 <button class="job-action-btn" onclick="viewArtifact('${a.artifact_id}')">View</button>
-                                <button class="job-action-btn btn-neutral" onclick="copyLink('${a.artifact_id}')">${linkLabel}</button>
-                                <button class="job-action-btn btn-neutral" onclick="toggleVisibility('${a.artifact_id}', ${!a.is_public})">${toggleLabel}</button>
-                                <button class="job-action-btn btn-neutral" onclick="managePassphrase('${a.artifact_id}')">${secretLabel}</button>
+                                <button class="job-action-btn" onclick="copyLink('${a.artifact_id}')">${linkLabel}</button>
+                                <button class="job-action-btn" onclick="toggleVisibility('${a.artifact_id}', ${!a.is_public})">${toggleLabel}</button>
+                                <button class="job-action-btn" onclick="managePassphrase('${a.artifact_id}')">${secretLabel}</button>
                                 ${trashButton(`deleteArtifact('${a.artifact_id}')`, 'Delete artifact', 'job-action-btn')}
                             </div>
                         </td>

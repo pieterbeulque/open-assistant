@@ -30,6 +30,13 @@
     vertical-align: middle;
 }
 
+.icon-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
 .icon-spin {
     animation: spin 1s linear infinite;
 }
@@ -41,15 +48,27 @@
 /* --------------------------------------------------------------------------
    2. BUTTON
    .btn + one variant (.btn-primary | .btn-secondary | .btn-ghost |
-   .btn-danger | .btn-success) + optional size (.btn-sm | .btn-lg) and
-   .btn-block. Icons go inside as <svg class="icon">.
+   .btn-danger | .btn-destructive) + optional size (.btn-sm | .btn-lg),
+   .btn-block, and .btn-icon for a square icon-only button. Icons go inside
+   as <svg class="icon">.
+
+   Every variant only sets the private --_btn-* properties; the base rule
+   is the only place that paints. Order matters: base, then .btn-icon
+   (quiet defaults), then the variants, so a variant always wins over the
+   icon-button defaults without any :not() chains.
    -------------------------------------------------------------------------- */
-.btn {
+.btn,
+.btn-icon,
+.icon-btn,
+.job-action-btn {
     --_btn-bg: var(--color-surface);
     --_btn-fg: var(--color-text);
     --_btn-border: var(--color-border-strong);
     --_btn-bg-hover: var(--color-sunken);
+    --_btn-fg-hover: var(--_btn-fg);
     --_btn-border-hover: var(--color-border-control);
+    --_btn-shadow: none;
+    --_btn-ring: var(--color-focus-ring);
 
     display: inline-flex;
     align-items: center;
@@ -61,6 +80,7 @@
     border-radius: var(--radius-md);
     background: var(--_btn-bg);
     color: var(--_btn-fg);
+    box-shadow: var(--_btn-shadow);
     font-family: inherit;
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
@@ -77,49 +97,70 @@
                 transform var(--duration-fast) ease;
 }
 
-.btn:hover:not(:disabled) {
+:is(.btn, .btn-icon, .icon-btn, .job-action-btn):hover:not(:disabled) {
     background: var(--_btn-bg-hover);
     border-color: var(--_btn-border-hover);
-    color: var(--_btn-fg);
+    color: var(--_btn-fg-hover);
 }
 
 .btn:active:not(:disabled) {
     transform: translateY(1px);
 }
 
-.btn:focus-visible {
+:is(.btn, .btn-icon, .icon-btn, .job-action-btn):focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px var(--color-focus-ring);
-    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 3px var(--_btn-ring);
 }
 
-.btn:disabled,
+:is(.btn, .btn-icon, .icon-btn, .job-action-btn):disabled,
 .btn[aria-disabled="true"] {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.btn .icon {
+:is(.btn, .btn-icon, .icon-btn, .job-action-btn) .icon {
     width: 16px;
     height: 16px;
 }
 
+/* Square icon-only button, with or without .btn. On its own it is quiet
+   (ghost); add a variant (.btn .btn-danger .btn-icon) to colour it. */
+.btn-icon,
+.icon-btn {
+    --_btn-bg: transparent;
+    --_btn-fg: var(--color-text-secondary);
+    --_btn-border: transparent;
+    --_btn-bg-hover: var(--color-fill-hover);
+    --_btn-fg-hover: var(--color-text);
+    --_btn-border-hover: transparent;
+
+    flex-shrink: 0;
+    width: var(--control-h-md);
+    min-width: var(--control-h-md);
+    height: var(--control-h-md);
+    padding: 0;
+    line-height: 1;
+}
+
 /* Variants */
-.btn-primary,
-.btn-solid {
+.btn-primary {
     --_btn-bg: var(--color-accent);
     --_btn-fg: var(--color-on-accent);
     --_btn-border: var(--color-accent);
     --_btn-bg-hover: var(--color-accent-hover);
+    --_btn-fg-hover: var(--color-on-accent);
     --_btn-border-hover: var(--color-accent-hover);
-    box-shadow: var(--shadow-xs);
+    --_btn-shadow: var(--shadow-xs);
 }
 
 .btn-secondary {
     --_btn-bg: var(--color-surface);
     --_btn-fg: var(--color-text);
     --_btn-border: var(--color-border-strong);
-    box-shadow: var(--shadow-xs);
+    --_btn-bg-hover: var(--color-sunken);
+    --_btn-fg-hover: var(--color-text);
+    --_btn-border-hover: var(--color-border-control);
+    --_btn-shadow: var(--shadow-xs);
 }
 
 .btn-ghost {
@@ -127,11 +168,8 @@
     --_btn-fg: var(--color-text-secondary);
     --_btn-border: transparent;
     --_btn-bg-hover: var(--color-fill-hover);
+    --_btn-fg-hover: var(--color-text);
     --_btn-border-hover: transparent;
-}
-
-.btn-ghost:hover:not(:disabled) {
-    color: var(--color-text);
 }
 
 .btn-danger {
@@ -139,6 +177,7 @@
     --_btn-fg: var(--color-danger-fg);
     --_btn-border: var(--color-danger-border);
     --_btn-bg-hover: color-mix(in oklab, var(--color-danger-bg) 70%, var(--color-danger-border));
+    --_btn-fg-hover: var(--color-danger-fg);
     --_btn-border-hover: var(--color-danger-fg);
 }
 
@@ -149,28 +188,10 @@
     --_btn-fg: var(--color-on-danger);
     --_btn-border: var(--color-danger-emphasis);
     --_btn-bg-hover: var(--color-danger-emphasis-hover);
+    --_btn-fg-hover: var(--color-on-danger);
     --_btn-border-hover: var(--color-danger-emphasis-hover);
-    box-shadow: var(--shadow-xs);
-}
-
-.btn-destructive:focus-visible {
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger-emphasis) 30%, transparent);
-}
-
-.btn-success {
-    --_btn-bg: var(--color-success-bg);
-    --_btn-fg: var(--color-success-fg);
-    --_btn-border: var(--color-success-border);
-    --_btn-bg-hover: color-mix(in oklab, var(--color-success-bg) 70%, var(--color-success-border));
-    --_btn-border-hover: var(--color-success-fg);
-}
-
-.btn-warning {
-    --_btn-bg: var(--color-warning-bg);
-    --_btn-fg: var(--color-warning-fg);
-    --_btn-border: var(--color-warning-border);
-    --_btn-bg-hover: color-mix(in oklab, var(--color-warning-bg) 70%, var(--color-warning-border));
-    --_btn-border-hover: var(--color-warning-fg);
+    --_btn-shadow: var(--shadow-xs);
+    --_btn-ring: color-mix(in oklab, var(--color-danger-emphasis) 30%, transparent);
 }
 
 /* Sizes */
@@ -180,10 +201,6 @@
     border-radius: var(--radius-sm);
     font-size: var(--text-sm);
     gap: var(--space-1-5);
-}
-
-.btn-sm:focus-visible {
-    border-radius: var(--radius-sm);
 }
 
 .btn-lg {
@@ -197,80 +214,22 @@
     width: 100%;
 }
 
-/* Square icon-only button. Works with or without .btn. */
-.btn-icon,
-.icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: var(--control-h-md);
-    height: var(--control-h-md);
+.btn-icon.btn-sm,
+.icon-btn-sm {
+    width: var(--control-h-sm);
+    min-width: var(--control-h-sm);
+    height: var(--control-h-sm);
+    min-height: var(--control-h-sm);
     padding: 0;
-    border: 1px solid transparent;
-    border-radius: var(--radius-md);
-    background: transparent;
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease, border-color var(--duration-fast) ease;
-}
-
-.btn-icon:hover:not(:disabled),
-.icon-btn:hover:not(:disabled) {
-    background: var(--color-fill-hover);
-    color: var(--color-text);
+    border-radius: var(--radius-sm);
 }
 
 /* Inside an input group the icon button sits next to a bordered input,
    so it gets a matching border. */
 .input-group .btn-icon {
-    border-color: var(--color-border-strong);
-    background: var(--color-surface);
+    --_btn-border: var(--color-border-strong);
+    --_btn-bg: var(--color-surface);
     filter: grayscale(1);
-}
-
-.icon-btn-sm,
-.btn-icon.btn-sm {
-    width: var(--control-h-sm);
-    min-width: var(--control-h-sm);
-    height: var(--control-h-sm);
-    min-height: var(--control-h-sm);
-    border-radius: var(--radius-sm);
-}
-
-/* .btn + variant + .btn-icon: a square button that keeps the variant's
-   colours (e.g. the shaded red trash button: .btn .btn-danger .btn-icon). */
-.btn.btn-icon {
-    min-width: var(--control-h-md);
-    min-height: var(--control-h-md);
-    border-color: var(--_btn-border);
-    background: var(--_btn-bg);
-    color: var(--_btn-fg);
-}
-
-.btn.btn-icon.btn-sm {
-    min-width: var(--control-h-sm);
-    min-height: var(--control-h-sm);
-}
-
-.btn.btn-icon:hover:not(:disabled) {
-    border-color: var(--_btn-border-hover);
-    background: var(--_btn-bg-hover);
-    color: var(--_btn-fg);
-}
-
-.btn-icon .icon {
-    width: 16px;
-    height: 16px;
-}
-
-/* A plain .btn without a variant stays quiet when used as an icon button */
-.btn.btn-icon:not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.btn-success):not(.btn-warning):not(.btn-destructive) {
-    border-color: transparent;
-    background: transparent;
-    color: var(--color-text-secondary);
 }
 
 .button-group,
@@ -560,8 +519,8 @@ select.form-input {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--gray-0);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--color-knob);
+    box-shadow: var(--shadow-knob);
     transition: transform var(--duration-base) var(--ease-out);
 }
 
@@ -631,6 +590,17 @@ input[type="radio"] {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xs);
     padding: var(--space-6);
+}
+
+/* Size containers. Component layout that depends on available width uses
+   @container queries against these instead of viewport media queries:
+     card   - every card-like surface (card-level reflow, see common.css)
+     table  - table wrappers (row stacking, see section 11) */
+.card,
+.settings-section,
+.agent-card,
+.integration-card {
+    container: card / inline-size;
 }
 
 .card-header {
@@ -718,15 +688,11 @@ input[type="radio"] {
 
 /* --------------------------------------------------------------------------
    7. BADGE & STATUS DOT
-   .badge + .badge-{neutral|success|warning|danger|accent|outline}
-   Legacy status classes from across the app are mapped onto the same
-   five tones so every pill in the product looks the same.
+   .badge + a tone: .badge-{success|warning|danger|neutral} for outcomes,
+   .badge-on / .badge-off for states. .badge-sm for dense rows. For job
+   and run statuses use statusBadgeClass(status) from components.js.
    -------------------------------------------------------------------------- */
-.badge,
-.status-badge,
-.status-badge-inline,
-.session-badge,
-.setting-source {
+.badge {
     --_badge-bg: var(--color-neutral-bg);
     --_badge-fg: var(--color-neutral-fg);
     --_badge-border: transparent;
@@ -744,80 +710,47 @@ input[type="radio"] {
     font-weight: var(--weight-medium);
     line-height: 1;
     letter-spacing: 0;
-    text-transform: none;
     white-space: nowrap;
     vertical-align: middle;
 }
 
-.badge-sm,
-.setting-source {
+.badge-sm {
     height: 20px;
     padding: 0 var(--space-2);
 }
 
-/* Tones */
-.badge-success,
-.status-success,
-.status-badge-completed,
-.status-badge-success,
-.session-badge-success {
+/* Outcomes */
+.badge-success {
     --_badge-bg: var(--color-success-bg);
     --_badge-fg: var(--color-success-fg);
 }
 
-.badge-warning,
-.status-warning,
-.badge-pending,
-.session-badge-warning {
+.badge-warning {
     --_badge-bg: var(--color-warning-bg);
     --_badge-fg: var(--color-warning-fg);
 }
 
-.badge-danger,
-.badge-error,
-.status-error,
-.status-badge-failed,
-.session-badge-error {
+.badge-danger {
     --_badge-bg: var(--color-danger-bg);
     --_badge-fg: var(--color-danger-fg);
 }
 
-.badge-neutral,
-.status-info,
-.badge-provisioning,
-.status-badge-cancelled,
-.status-badge-skipped,
-.status-badge-pending,
-.status-badge-running,
-.session-badge-neutral,
-.source-default,
-.source-env {
+.badge-neutral {
     --_badge-bg: var(--color-neutral-bg);
     --_badge-fg: var(--color-neutral-fg);
 }
 
-/* "On" states (enabled, running, public) are states, not successes:
-   they stay monochrome and read as the stronger of the two neutrals. */
-.badge-accent,
-.badge-on,
-.status-enabled,
-.badge-running,
-.status-badge-enabled,
-.status-badge-public,
-.source-db {
+/* States: "on" (enabled, running, public, saved) is not a success, so it
+   stays monochrome and reads as the stronger of the two neutrals. */
+.badge-on {
     --_badge-bg: var(--color-accent-subtle);
     --_badge-fg: var(--color-text);
     --_badge-border: var(--color-border);
 }
 
-/* "Off" states (disabled, private, stopped) */
-.badge-outline,
+/* "Off" (disabled, private, not configured) */
 .badge-off,
-.status-disabled,
-.badge-stopped,
-.badge-deleted,
-.status-badge-disabled,
-.status-badge-private {
+.badge-outline {
     --_badge-bg: transparent;
     --_badge-fg: var(--color-text-tertiary);
     --_badge-border: var(--color-border-strong);
@@ -845,9 +778,7 @@ input[type="radio"] {
    8. ALERT / CALLOUT
    .alert + .alert-{info|success|warning|danger}; optional <strong> title.
    -------------------------------------------------------------------------- */
-.alert,
-.banner,
-.info-box {
+.alert {
     --_alert-bg: var(--color-neutral-bg);
     --_alert-fg: var(--color-text);
     --_alert-border: var(--color-neutral-border);
@@ -865,30 +796,14 @@ input[type="radio"] {
     line-height: var(--leading-normal);
 }
 
-.info-box {
-    display: block;
-}
-
 .alert > .icon {
     width: 16px;
     height: 16px;
     margin-top: 2px;
 }
 
-.alert strong,
-.info-box strong {
+.alert strong {
     font-weight: var(--weight-semibold);
-}
-
-.info-box strong {
-    display: block;
-    margin-bottom: var(--space-1);
-}
-
-.alert-info {
-    --_alert-bg: var(--color-neutral-bg);
-    --_alert-fg: var(--color-text);
-    --_alert-border: var(--color-neutral-border);
 }
 
 .alert-success {
@@ -897,27 +812,16 @@ input[type="radio"] {
     --_alert-border: var(--color-success-border);
 }
 
-.alert-warning,
-.banner-warning {
+.alert-warning {
     --_alert-bg: var(--color-warning-bg);
     --_alert-fg: var(--color-warning-fg);
     --_alert-border: var(--color-warning-border);
 }
 
-.alert-danger,
-.alert-error {
+.alert-danger {
     --_alert-bg: var(--color-danger-bg);
     --_alert-fg: var(--color-danger-fg);
     --_alert-border: var(--color-danger-border);
-}
-
-.banner {
-    justify-content: space-between;
-    align-items: center;
-}
-
-.banner span {
-    flex: 1;
 }
 
 /* Inline result line (e.g. "Test connection") */
@@ -961,6 +865,10 @@ input[type="radio"] {
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     animation: oa-fade-in var(--duration-base) ease-out;
+}
+
+.modal-overlay.is-leaving {
+    animation: oa-fade-in var(--duration-base) ease-out reverse forwards;
 }
 
 .modal.active,
@@ -1069,7 +977,6 @@ input[type="radio"] {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--color-text-tertiary);
-    font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
     transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
@@ -1178,13 +1085,9 @@ input[type="radio"] {
 }
 
 .tab.active {
-    background: var(--color-surface);
+    background: var(--color-tab-active);
     color: var(--color-text);
     box-shadow: var(--shadow-sm);
-}
-
-:root[data-theme="dark"] .tab.active {
-    background: var(--color-border-strong);
 }
 
 .tab-content {
@@ -1270,7 +1173,9 @@ input[type="radio"] {
 }
 
 .table-scroll,
-.jobs-table-wrap {
+.jobs-table-wrap,
+.audit-log {
+    container: table / inline-size;
     width: 100%;
     min-width: 0;
     overflow-x: auto;
@@ -1281,7 +1186,7 @@ input[type="radio"] {
    the last column takes up the remaining width (its actions sit flush
    right). When the content is wider than the container, the wrapper
    above scrolls horizontally instead of squashing the columns. */
-@media (min-width: 769px) {
+@container table (min-width: 641px) {
     .table th:not(:last-child),
     .table td:not(:last-child),
     .jobs-table th:not(:last-child),
@@ -1319,42 +1224,14 @@ input[type="radio"] {
     gap: var(--space-1-5);
 }
 
+/* Compact row action inside tables. It shares the button base (and its
+   variants, e.g. .job-action-btn.btn-danger); this rule only sets size. */
 .job-action-btn {
-    display: inline-flex;
-    align-items: center;
     gap: var(--space-1);
     min-height: 28px;
     padding: 0 var(--space-2-5);
-    border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
     font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease;
-}
-
-.job-action-btn:hover:not(:disabled) {
-    background: var(--color-sunken);
-    border-color: var(--color-border-control);
-}
-
-.job-action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.job-action-btn.btn-danger {
-    background: var(--color-danger-bg);
-    border-color: var(--color-danger-border);
-    color: var(--color-danger-fg);
-}
-
-.job-action-btn.btn-danger:hover:not(:disabled) {
-    background: color-mix(in oklab, var(--color-danger-bg) 70%, var(--color-danger-border));
-    border-color: var(--color-danger-fg);
 }
 
 /* Square icon-only row action (e.g. the trash button) */
@@ -1370,23 +1247,11 @@ input[type="radio"] {
     height: 14px;
 }
 
-.job-action-btn.btn-warning {
-    background: transparent;
-    border-color: var(--color-warning-border);
-    color: var(--color-warning-fg);
-}
-
-.job-action-btn.btn-warning:hover:not(:disabled) {
-    background: var(--color-warning-bg);
-}
-
-.job-action-btn.btn-neutral {
-    background: var(--color-surface);
-}
-
 /* Responsive "stacked" table: add .table-stack (or use .jobs-table) and
-   data-label="" on each <td>; below 768px rows become cards. */
-@media (max-width: 768px) {
+   data-label="" on each <td>. Rows become cards when the table's wrapper
+   (.table-scroll / .jobs-table-wrap, a size container) is narrower than
+   640px - so a table in a narrow column stacks even on a wide screen. */
+@container table (max-width: 640px) {
     .table-stack,
     .table-stack thead,
     .table-stack tbody,
@@ -1503,6 +1368,10 @@ input[type="radio"] {
     line-height: var(--leading-snug);
     pointer-events: auto;
     animation: oa-slide-in-right var(--duration-slow) var(--ease-out);
+}
+
+.toast.is-leaving {
+    animation: oa-slide-in-right var(--duration-slow) var(--ease-out) reverse forwards;
 }
 
 .toast::before {
@@ -1685,6 +1554,7 @@ p.text-muted {
 .font-mono { font-family: var(--font-mono); }
 .tabular { font-variant-numeric: tabular-nums; }
 
+.mt-0 { margin-top: 0; }
 .mt-1 { margin-top: var(--space-2); }
 .mt-2 { margin-top: var(--space-4); }
 .mt-3 { margin-top: var(--space-6); }
@@ -1705,6 +1575,24 @@ p.text-muted {
 .flex-center { justify-content: center; align-items: center; }
 .flex-between { justify-content: space-between; align-items: center; }
 .grow { flex: 1; min-width: 0; }
+.self-start { align-self: flex-start; }
+
+/* Two equal columns that collapse to one in a narrow container */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.form-grid-2 > .form-group {
+    margin: 0;
+}
+
+/* Constrained form widths inside cards and modals */
+.measure-sm { max-width: 480px; }
+.measure-md { max-width: 600px; }
+.measure-lg { max-width: 680px; }
 
 .sr-only {
     position: absolute;

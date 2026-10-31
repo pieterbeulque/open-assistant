@@ -133,6 +133,34 @@
     font-size: var(--text-xs);
 }
 
+.log-entry-toggle {
+    cursor: pointer;
+}
+
+.log-entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.log-entry-status {
+    display: inline-flex;
+    margin-right: var(--space-2);
+    vertical-align: -3px;
+}
+
+.log-entry-sep {
+    margin: 0 var(--space-2);
+    color: var(--color-text-tertiary);
+}
+
+.log-entry-meta {
+    margin-left: var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+}
+
 .log-timestamp {
     color: var(--color-text-tertiary);
     font-size: var(--text-xs);
@@ -219,7 +247,7 @@
 .log-level-critical { color: var(--color-danger-fg); text-decoration: underline; text-underline-offset: 3px; }
 .log-level-unknown { color: var(--color-text-secondary); }
 
-.log-stream-status { color: var(--color-text-tertiary); }
+.log-stream-status { padding: var(--space-1) 0; color: var(--color-text-tertiary); }
 .log-stream-status.log-stream-status-error { color: var(--color-danger-fg); }
 
 .logs-status {
@@ -262,6 +290,39 @@
     flex-direction: column;
     gap: var(--space-3);
     margin-bottom: var(--space-4);
+}
+
+/* One editable step in the recipe modal: a compact, denser form */
+.recipe-step {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg);
+}
+
+.recipe-step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+}
+
+.recipe-step .form-group {
+    margin-bottom: var(--space-2);
+}
+
+.recipe-step .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.recipe-step .form-input,
+.recipe-step .form-textarea {
+    font-size: var(--text-sm);
+}
+
+.recipe-step .form-textarea {
+    min-height: 80px;
 }
 
 /* --------------------------------------------------------------------------
@@ -557,6 +618,18 @@
     text-align: center;
 }
 
+/* Card headers reflow with the card's width (container query) */
+@container card (max-width: 560px) {
+    .card-header-actions {
+        width: 100%;
+    }
+
+    .card-header-actions .form-control {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
 /* --------------------------------------------------------------------------
    Mobile
    -------------------------------------------------------------------------- */
@@ -569,14 +642,6 @@
         height: 60vh;
     }
 
-    .card-header-actions {
-        width: 100%;
-    }
-
-    .card-header-actions .form-control {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
 
     .monitoring-container .card .jobs-table-wrap {
         margin: 0;

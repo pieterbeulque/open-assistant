@@ -14,6 +14,8 @@
    2. Semantic     --color-bg, --color-text, --color-success-fg, ...
    3. Components   consume semantic tokens only (components.css, common.css)
 
+   These rules are enforced by tests/test_design_system.py.
+
    Colour philosophy
    -----------------
    The interface is monochromatic: a soft, very slightly warm neutral
@@ -33,7 +35,10 @@
        :root { --brand: #3b5bdb; --brand-contrast: #ffffff; }
 
    and every accent-derived token (hover, subtle tint, focus ring) follows
-   automatically via color-mix(). Nothing else needs to change.
+   automatically via color-mix(). Nothing else needs to change. A brand
+   that is too dark to read on the dark canvas can be given a dark-theme
+   variant with --brand-dark / --brand-dark-contrast (both optional, they
+   fall back to --brand / --brand-contrast).
 
    Theming
    -------
@@ -41,6 +46,8 @@
    <html data-theme="light|dark"> before first paint from the user's
    light/dark/system preference; [data-theme="dark"] overrides colour
    tokens only. Shape, type and spacing tokens are theme-independent.
+   Without data-theme (no JS) the same dark block applies through
+   prefers-color-scheme, so the OS setting is still honoured.
 
    Contrast (WCAG 2.1, computed):
      light  text 17.1:1 · secondary 7.2:1 · tertiary 5.3:1 on surface
@@ -150,6 +157,16 @@
     --color-danger-emphasis-hover: var(--red-700);
     --color-on-danger: #ffffff;
 
+    /* Fixed in both themes: a QR code must stay dark-on-light to scan,
+       and the toggle knob is always a white disc. */
+    --color-qr-bg: #ffffff;
+    --color-qr-fg: #585853;
+    --color-knob: #ffffff;
+    --shadow-knob: 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    /* The selected segment of a .tabs control */
+    --color-tab-active: var(--color-surface);
+
     /* Info / neutral are intentionally monochrome */
     --color-neutral-fg: var(--gray-700);
     --color-neutral-bg: var(--gray-100);
@@ -218,6 +235,13 @@
     --control-h-md: 40px;
     --control-h-lg: 48px;
 
+    /* Layout breakpoints. Custom properties can't be used inside @media,
+       so these are conventions (checked by tests/test_design_system.py):
+         phone   @media (max-width: 768px)  /  (min-width: 769px)
+         tablet  @media (max-width: 1024px) and (min-width: 769px)
+       Viewport media queries are for page chrome only (navigation,
+       sidebars, page padding, bottom-sheet modals). Components respond to
+       their own width with @container card / @container table. */
     --content-max: 1080px;
     --content-narrow: 760px;
     --nav-width: 232px;
@@ -244,53 +268,6 @@
     --z-nav: 1000;
     --z-modal: 2000;
     --z-toast: 3000;
-
-    /* ---------------------------------------------------------------------
-       8. LEGACY ALIASES
-       Older markup (and a few JS-generated snippets) reference these
-       names. They map onto the new semantic tokens; prefer the new names
-       in anything you write.
-       --------------------------------------------------------------------- */
-    --color-primary: var(--color-accent);
-    --color-primary-dark: var(--color-accent-hover);
-    --color-on-primary: var(--color-on-accent);
-    --color-primary-glow: var(--color-focus-ring);
-    --color-bg-darker: var(--color-sunken);
-    --color-text-muted: var(--color-text-secondary);
-    --color-text-dim: var(--color-text-tertiary);
-    --color-text-dimmer: var(--color-text-tertiary);
-    --color-border-accent: var(--color-border-strong);
-    --color-success: var(--color-success-fg);
-    --color-warning: var(--color-warning-fg);
-    --color-error: var(--color-danger-fg);
-    --color-error-bg: var(--color-danger-bg);
-    --color-info: var(--color-neutral-fg);
-    --color-info-bg: var(--color-neutral-bg);
-    --color-neutral: var(--color-neutral-fg);
-
-    --primary-color: var(--color-accent);
-    --primary-dark: var(--color-accent-hover);
-    --primary-glow: var(--color-focus-ring);
-    --primary-gradient: var(--color-accent);
-    --background-color: var(--color-bg);
-    --background-darker: var(--color-sunken);
-    --background-secondary: var(--color-sunken);
-    --bg-secondary: var(--color-sunken);
-    --card-background: var(--color-surface);
-    --text-primary: var(--color-text);
-    --text-secondary: var(--color-text-secondary);
-    --text-muted: var(--color-text-secondary);
-    --border-color: var(--color-border);
-    --error-color: var(--color-danger-fg);
-    --error-background: var(--color-danger-bg);
-    --success-color: var(--color-success-fg);
-    --success-background: var(--color-success-bg);
-    --warning-color: var(--color-warning-fg);
-    --warning-background: var(--color-warning-bg);
-    --radius: var(--radius-md);
-    --shadow: var(--shadow-sm);
-    --shadow-hover: var(--shadow-md);
-    --shadow-xl: var(--shadow-lg);
 }
 
 /* ==========================================================================
@@ -319,8 +296,8 @@
     --color-border-strong: #3d3d39;
     --color-border-control: #6b6b65;
 
-    --color-accent: var(--brand, #ededea);
-    --color-on-accent: var(--brand-contrast, #121211);
+    --color-accent: var(--brand-dark, var(--brand, #ededea));
+    --color-on-accent: var(--brand-dark-contrast, var(--brand-contrast, #121211));
 
     --color-success-fg: #8cd2a6;
     --color-success-bg: #1a2c21;
@@ -340,6 +317,8 @@
     --color-danger-emphasis-hover: #c74d43;
     --color-on-danger: #ffffff;
 
+    --color-tab-active: var(--color-border-strong);
+
     --color-neutral-fg: #b5b5af;
     --color-neutral-bg: #262624;
     --color-neutral-border: #353532;
@@ -349,4 +328,66 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.45);
+}
+
+/* No-JS fallback: until theme.js sets data-theme (or if it never runs),
+   follow the OS. This block must stay identical to the one above -
+   tests/test_design_system.py enforces that. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        color-scheme: dark;
+
+        --color-bg: #121211;
+        --color-surface: #1b1b19;
+        --color-surface-raised: #222220;
+        --color-sunken: #232321;
+        --color-overlay: rgba(0, 0, 0, 0.55);
+
+        --color-fill-hover: rgba(237, 237, 234, 0.06);
+        --color-fill-active: rgba(237, 237, 234, 0.1);
+
+        --color-text: #ededea;
+        --color-text-secondary: #b5b5af;
+        --color-text-tertiary: #97978f;
+        --color-text-disabled: #5f5f5a;
+        --color-text-inverse: #121211;
+
+        --color-border-subtle: #262624;
+        --color-border: #2f2f2c;
+        --color-border-strong: #3d3d39;
+        --color-border-control: #6b6b65;
+
+        --color-accent: var(--brand-dark, var(--brand, #ededea));
+        --color-on-accent: var(--brand-dark-contrast, var(--brand-contrast, #121211));
+
+        --color-success-fg: #8cd2a6;
+        --color-success-bg: #1a2c21;
+        --color-success-border: #2a4a36;
+        --color-success-solid: #5fb883;
+
+        --color-warning-fg: #f0b577;
+        --color-warning-bg: #2f2418;
+        --color-warning-border: #4d3a24;
+        --color-warning-solid: #e39a4f;
+
+        --color-danger-fg: #f29c94;
+        --color-danger-bg: #351e1c;
+        --color-danger-border: #55302c;
+        --color-danger-solid: #e2766c;
+        --color-danger-emphasis: #b8413a;
+        --color-danger-emphasis-hover: #c74d43;
+        --color-on-danger: #ffffff;
+
+        --color-tab-active: var(--color-border-strong);
+
+        --color-neutral-fg: #b5b5af;
+        --color-neutral-bg: #262624;
+        --color-neutral-border: #353532;
+        --color-neutral-solid: #8a8a84;
+
+        --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+        --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.45);
+    }
 }

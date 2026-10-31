@@ -92,8 +92,8 @@ class ToastManager {
         this.container.appendChild(toast);
 
         setTimeout(() => {
-            toast.style.animation = 'slideInRight 0.3s ease-out reverse';
-            setTimeout(() => toast.remove(), 300);
+            toast.classList.add('is-leaving');
+            setTimeout(() => toast.remove(), 280);
         }, duration);
     }
 
@@ -200,8 +200,8 @@ class ModalManager {
     }
 
     close(overlay) {
-        overlay.style.animation = 'fadeIn 0.2s reverse';
-        setTimeout(() => overlay.remove(), 200);
+        overlay.classList.add('is-leaving');
+        setTimeout(() => overlay.remove(), 180);
     }
 
     // Callback style. options: { confirmText, cancelText, danger }

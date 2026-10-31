@@ -118,11 +118,11 @@ function hideManagedTabs() {
     tabsToHide.forEach(tabName => {
         const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
         if (tab) {
-            tab.style.display = 'none';
+            tab.hidden = true;
         }
         const tabContent = document.getElementById(`${tabName}-tab`);
         if (tabContent) {
-            tabContent.style.display = 'none';
+            tabContent.hidden = true;
         }
     });
 
@@ -138,7 +138,7 @@ function hideManagedTabs() {
     sectionsToHide.forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
-            section.style.display = 'none';
+            section.hidden = true;
         }
     });
 }
@@ -345,7 +345,7 @@ function renderField(setting) {
     settingsState.currentValues[def.key] = value;
 
     const SOURCE_LABELS = { db: 'Saved', env: 'Environment', default: 'Default' };
-    const sourceBadge = `<span class="setting-source source-${source}" title="Where this value comes from">${SOURCE_LABELS[source] || source}</span>`;
+    const sourceBadge = `<span class="badge badge-sm ${source === 'db' ? 'badge-on' : 'badge-neutral'}" title="Where this value comes from">${SOURCE_LABELS[source] || source}</span>`;
 
     let fieldHtml = '';
 
@@ -385,7 +385,7 @@ function renderField(setting) {
     const startsHidden = dependsOn && !dependencyValueMatches(dependsOn);
 
     return `
-        <div class="form-group"${dependencyAttrs}${startsHidden ? ' style="display: none;"' : ''}>
+        <div class="form-group"${dependencyAttrs}${startsHidden ? ' hidden' : ''}>
             <div class="setting-header">
                 <label class="form-label" for="${def.key}">
                     ${def.display_name}
@@ -418,7 +418,7 @@ function applyFieldDependencies() {
             key: group.getAttribute('data-depends-on-key'),
             value: group.getAttribute('data-depends-on-value') === 'true',
         };
-        group.style.display = dependencyValueMatches(dependsOn) ? '' : 'none';
+        group.hidden = !dependencyValueMatches(dependsOn);
     });
 }
 
@@ -760,7 +760,7 @@ async function createIntegrationCard(serviceName) {
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <div class="integration-body" style="display: none;">
+            <div class="integration-body" hidden>
                 ${(!isManaged || managedFields.length === 0) && !isNoConfigService ? `<div class="integration-help">
                     <a href="${docUrl}" target="_blank" class="help-link">
                         How to get ${getServiceDisplayName(serviceName)} credentials ${icon('arrow-up-right')}
@@ -864,9 +864,9 @@ function getIntegrationDocUrl(service) {
 
 function renderConnectionStatus(hasCredentials, service) {
     if (hasCredentials) {
-        return '<span class="status-badge status-success">Connected</span>';
+        return '<span class="badge badge-success">Connected</span>';
     } else {
-        return '<span class="status-badge status-disabled">Not configured</span>';
+        return '<span class="badge badge-off">Not configured</span>';
     }
 }
 
@@ -890,8 +890,8 @@ function toggleIntegrationExpanded(service) {
     const body = card.querySelector('.integration-body');
     const icon = card.querySelector('.expand-icon');
 
-    const expanded = body.style.display === 'none';
-    body.style.display = expanded ? 'block' : 'none';
+    const expanded = body.hidden;
+    body.hidden = !expanded;
     if (icon) icon.classList.toggle('expanded', expanded);
     card.classList.toggle('is-expanded', expanded);
 }
@@ -983,7 +983,7 @@ async function saveIntegrationSettings() {
 }
 
 function closeIntegrationModal() {
-    document.getElementById('integrationModal').style.display = 'none';
+    document.getElementById('integrationModal').classList.remove('active');
     settingsState.currentIntegration = null;
 }
 
@@ -1073,7 +1073,7 @@ async function savePrompts() {
 async function testLLMConnection() {
     try {
         const resultDiv = document.getElementById('llm-test-result');
-        resultDiv.style.display = 'block';
+        resultDiv.hidden = false;
         resultDiv.innerHTML = '<p>Testing connection...</p>';
 
         const response = await api.post('/api/settings/test-llm');
@@ -1088,7 +1088,7 @@ async function testLLMConnection() {
 
     } catch (error) {
         const resultDiv = document.getElementById('llm-test-result');
-        resultDiv.style.display = 'block';
+        resultDiv.hidden = false;
         resultDiv.innerHTML = `<p class="error">Test failed: ${error.message}</p>`;
     }
 }
@@ -1135,7 +1135,7 @@ async function loadAuditLog() {
                             <td>${entry.event_type}</td>
                             <td>${entry.action}</td>
                             <td>
-                                <span class="status-badge ${entry.success ? 'status-success' : 'status-error'}">
+                                <span class="badge ${entry.success ? 'badge-success' : 'badge-danger'}">
                                     ${entry.success ? 'Success' : 'Failed'}
                                 </span>
                             </td>
@@ -1228,12 +1228,12 @@ async function fetchConnectionStatus(serviceName) {
 
 function getStatusClass(status) {
     const map = {
-        'connected': 'status-success',
-        'expired': 'status-warning',
-        'error': 'status-error',
-        'not_configured': 'status-info'
+        'connected': 'badge-success',
+        'expired': 'badge-warning',
+        'error': 'badge-danger',
+        'not_configured': 'badge-neutral'
     };
-    return map[status] || 'status-info';
+    return map[status] || 'badge-neutral';
 }
 
 function getStatusText(status) {
@@ -1486,7 +1486,7 @@ async function pollWhatsAppQr() {
 
         if (response.ready) {
             // Already connected
-            qrContainer.innerHTML = '<p style="color: var(--success-color); font-size: 1.2rem;">Connected</p>';
+            qrContainer.innerHTML = '<p class="qr-status text-success">Connected</p>';
             statusText.textContent = 'WhatsApp is linked and ready.';
             toast.success('WhatsApp is connected!');
             stopWhatsAppQrPolling();
@@ -1509,7 +1509,7 @@ async function pollWhatsAppQr() {
             });
             statusText.textContent = 'Scan this code with your phone to link WhatsApp.';
         } else {
-            qrContainer.innerHTML = '<p style="color: var(--text-muted);">Waiting for QR code from bridge...</p>';
+            qrContainer.innerHTML = '<p class="qr-status">Waiting for QR code from bridge...</p>';
             statusText.textContent = 'Make sure the WhatsApp bridge is running.';
         }
 
@@ -1534,7 +1534,7 @@ function closeWhatsAppQrModal() {
 
     // Reset modal content
     document.getElementById('whatsappQrCode').innerHTML =
-        '<p style="color: var(--text-muted);">Waiting for QR code...</p>';
+        '<p class="qr-status">Waiting for QR code...</p>';
     document.getElementById('whatsappQrStatus').textContent =
         'Waiting for authentication...';
 }
@@ -1653,7 +1653,7 @@ function createAgentCard(agent, index, total) {
     }
 
     const toolsCount = agent.tools ? agent.tools.length : 0;
-    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
+    const statusClass = agent.enabled ? 'badge-on' : 'badge-off';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const isCoordinator = agent.name === 'coordinator';
 
@@ -1675,7 +1675,7 @@ function createAgentCard(agent, index, total) {
                     </div>
                 </div>
                 <div class="agent-actions">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <span class="badge ${statusClass}">${statusText}</span>
                     <label class="toggle-label" ${isCoordinator ? 'title="Coordinator cannot be disabled"' : ''}>
                         <input
                             type="checkbox"
@@ -1708,7 +1708,7 @@ function createAgentCard(agent, index, total) {
 
 function createMcpAgentCard(agent, index, total) {
     const srv = (settingsState.mcpServers || {})[agent.name] || {};
-    const statusClass = agent.enabled ? 'status-enabled' : 'status-disabled';
+    const statusClass = agent.enabled ? 'badge-on' : 'badge-off';
     const statusText = agent.enabled ? 'Enabled' : 'Disabled';
     const serverId = agent.name.slice('mcp_'.length);
     const authType = srv.auth_type || 'header';
@@ -1759,7 +1759,7 @@ function createMcpAgentCard(agent, index, total) {
                     </div>
                 </div>
                 <div class="agent-actions">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <span class="badge ${statusClass}">${statusText}</span>
                     <label class="toggle-label">
                         <input
                             type="checkbox"
@@ -1941,10 +1941,10 @@ async function openAgentModal(agentName) {
         const resetBtn = document.getElementById('agent-reset-btn');
         if (resetBtn) {
             const defaultAgents = ['coordinator', 'research', 'communication', 'writer', 'file_handler', 'planner', 'system', 'navigator', 'browser'];
-            resetBtn.style.display = defaultAgents.includes(agentName) ? 'inline-block' : 'none';
+            resetBtn.hidden = !defaultAgents.includes(agentName);
         }
 
-        document.getElementById('agentModal').style.display = 'flex';
+        document.getElementById('agentModal').classList.add('active');
 
     } catch (error) {
         console.error('Failed to open agent modal:', error);
@@ -1953,7 +1953,7 @@ async function openAgentModal(agentName) {
 }
 
 function closeAgentModal() {
-    document.getElementById('agentModal').style.display = 'none';
+    document.getElementById('agentModal').classList.remove('active');
     settingsState.currentAgent = null;
 }
 
@@ -2037,11 +2037,11 @@ function openAddAgentModal() {
     document.getElementById('new-agent-role').value = '';
     document.getElementById('new-agent-goal').value = '';
     document.getElementById('new-agent-backstory').value = '';
-    document.getElementById('addAgentModal').style.display = 'flex';
+    document.getElementById('addAgentModal').classList.add('active');
 }
 
 function closeAddAgentModal() {
-    document.getElementById('addAgentModal').style.display = 'none';
+    document.getElementById('addAgentModal').classList.remove('active');
 }
 
 async function createNewAgent() {
@@ -2388,8 +2388,8 @@ function createPluginCard(plugin) {
                 <span class="toggle-slider"></span>
             </label>
         </div>
-        <div class="integration-body" id="plugin-body-${plugin.id}" style="display:none;">
-            <p class="text-muted" style="margin-bottom:16px;">${plugin.description}</p>
+        <div class="integration-body" id="plugin-body-${plugin.id}" hidden>
+            <p class="text-muted mb-2">${plugin.description}</p>
 
             ${credentialFields}
             ${configFieldsHtml}
@@ -2400,7 +2400,7 @@ function createPluginCard(plugin) {
                 ${!isBuiltin ? `<button onclick="showEditPluginModal('${plugin.id}')" class="btn btn-secondary">Edit JSON</button>` : ''}
                 ${!isBuiltin ? trashButton(`deletePlugin('${plugin.id}')`, 'Delete plugin', 'btn btn-danger btn-icon') : ''}
             </div>
-            <div id="plugin-status-${plugin.id}" style="margin-top:8px;"></div>
+            <div id="plugin-status-${plugin.id}" class="mt-1"></div>
         </div>`;
 
     // Load current config values async
@@ -2429,8 +2429,8 @@ async function loadPluginConfigValues(pluginId, configFields) {
 function togglePluginCard(pluginId) {
     const body = document.getElementById(`plugin-body-${pluginId}`);
     const chevron = document.getElementById(`plugin-chevron-${pluginId}`);
-    const expanded = body.style.display === 'none';
-    body.style.display = expanded ? 'block' : 'none';
+    const expanded = body.hidden;
+    body.hidden = !expanded;
     if (chevron) chevron.classList.toggle('expanded', expanded);
     body.closest('.integration-card')?.classList.toggle('is-expanded', expanded);
 }
@@ -2532,19 +2532,19 @@ let _editingPluginId = null;
 function showAddPluginModal() {
     _editingPluginId = null;
     document.getElementById('plugin-json-input').value = '';
-    document.getElementById('plugin-json-error').style.display = 'none';
+    document.getElementById('plugin-json-error').hidden = true;
     document.getElementById('plugin-modal-title').textContent = 'Install custom plugin';
     document.getElementById('plugin-modal-save-btn').textContent = 'Validate and install';
-    document.getElementById('addPluginModal').style.display = 'flex';
+    document.getElementById('addPluginModal').classList.add('active');
 }
 
 async function showEditPluginModal(pluginId) {
     _editingPluginId = pluginId;
-    document.getElementById('plugin-json-error').style.display = 'none';
+    document.getElementById('plugin-json-error').hidden = true;
     document.getElementById('plugin-modal-title').textContent = 'Edit plugin JSON';
     document.getElementById('plugin-modal-save-btn').textContent = 'Validate and save';
     document.getElementById('plugin-json-input').value = 'Loading...';
-    document.getElementById('addPluginModal').style.display = 'flex';
+    document.getElementById('addPluginModal').classList.add('active');
 
     try {
         const defn = await api.get(`/api/plugins/${pluginId}/definition`);
@@ -2553,12 +2553,12 @@ async function showEditPluginModal(pluginId) {
         document.getElementById('plugin-json-input').value = '';
         const errorEl = document.getElementById('plugin-json-error');
         errorEl.textContent = `Failed to load plugin definition: ${error.detail || error.message}`;
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
     }
 }
 
 function closeAddPluginModal() {
-    document.getElementById('addPluginModal').style.display = 'none';
+    document.getElementById('addPluginModal').classList.remove('active');
     _editingPluginId = null;
 }
 
@@ -2573,20 +2573,20 @@ async function savePluginJson() {
 async function _installPlugin() {
     const textarea = document.getElementById('plugin-json-input');
     const errorEl = document.getElementById('plugin-json-error');
-    errorEl.style.display = 'none';
+    errorEl.hidden = true;
 
     let parsed;
     try {
         parsed = JSON.parse(textarea.value);
     } catch (e) {
         errorEl.textContent = `Invalid JSON: ${e.message}`;
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
         return;
     }
 
     if (!parsed.id || !parsed.display_name || !parsed.endpoints || !parsed.auth) {
         errorEl.textContent = 'Missing required fields: id, display_name, auth, endpoints';
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
         return;
     }
 
@@ -2601,27 +2601,27 @@ async function _installPlugin() {
     } catch (error) {
         const msg = error.detail || error.message || 'Validation failed';
         errorEl.textContent = `Install failed: ${msg}`;
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
     }
 }
 
 async function _updatePlugin(pluginId) {
     const textarea = document.getElementById('plugin-json-input');
     const errorEl = document.getElementById('plugin-json-error');
-    errorEl.style.display = 'none';
+    errorEl.hidden = true;
 
     let parsed;
     try {
         parsed = JSON.parse(textarea.value);
     } catch (e) {
         errorEl.textContent = `Invalid JSON: ${e.message}`;
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
         return;
     }
 
     if (!parsed.id || !parsed.display_name || !parsed.endpoints || !parsed.auth) {
         errorEl.textContent = 'Missing required fields: id, display_name, auth, endpoints';
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
         return;
     }
 
@@ -2640,7 +2640,7 @@ async function _updatePlugin(pluginId) {
     } catch (error) {
         const msg = error.detail || error.message || 'Validation failed';
         errorEl.textContent = `Update failed: ${msg}`;
-        errorEl.style.display = 'block';
+        errorEl.hidden = false;
     }
 }
 
@@ -2663,28 +2663,27 @@ function showAddMcpModal() {
     document.querySelector('input[name="mcp-auth-type"][value="header"]').checked = true;
     onMcpAuthTypeChange('header');
     addMcpHeaderRow();
-    document.getElementById('addMcpModal').style.display = 'flex';
+    document.getElementById('addMcpModal').classList.add('active');
 }
 
 function closeAddMcpModal() {
-    document.getElementById('addMcpModal').style.display = 'none';
+    document.getElementById('addMcpModal').classList.remove('active');
 }
 
 function onMcpAuthTypeChange(authType) {
-    document.getElementById('mcp-header-fields').style.display = authType === 'header' ? '' : 'none';
-    document.getElementById('mcp-oauth-fields').style.display = authType === 'oauth2' ? '' : 'none';
+    document.getElementById('mcp-header-fields').hidden = authType !== 'header';
+    document.getElementById('mcp-oauth-fields').hidden = authType !== 'oauth2';
 }
 
 function addMcpHeaderRow(name = '', value = '') {
     const list = document.getElementById('mcp-headers-list');
     const row = document.createElement('div');
     row.className = 'mcp-header-row';
-    row.style = 'display:flex; gap:6px; margin-bottom:6px;';
     row.innerHTML = `
         <input type="text" class="form-input mcp-header-name" placeholder="Header name (e.g. Authorization)"
-            value="${escapeAttr(name)}" style="flex:1;">
+            value="${escapeAttr(name)}">
         <input type="password" class="form-input mcp-header-value" placeholder="Value"
-            value="${escapeAttr(value)}" style="flex:1;">
+            value="${escapeAttr(value)}">
         ${trashButton('this.parentElement.remove()', 'Remove header', 'btn btn-danger btn-icon')}`;
     list.appendChild(row);
 }
@@ -2812,11 +2811,11 @@ function openMcpEditModal(serverId) {
     document.getElementById('mcp-edit-display-name').value = srv.display_name || '';
     document.getElementById('mcp-edit-keywords').value = (srv.intent_keywords || []).join(', ');
     document.getElementById('mcp-edit-backstory').value = srv.backstory || '';
-    document.getElementById('mcpEditModal').style.display = 'flex';
+    document.getElementById('mcpEditModal').classList.add('active');
 }
 
 function closeMcpEditModal() {
-    document.getElementById('mcpEditModal').style.display = 'none';
+    document.getElementById('mcpEditModal').classList.remove('active');
 }
 
 async function saveMcpEdit() {
@@ -2852,25 +2851,25 @@ function openMcpCredentialsModal(serverId) {
 
     const headerNames = srv.header_names || [];
     if (headerNames.length > 0) {
-        headersSection.style.display = '';
+        headersSection.hidden = false;
         headerNames.forEach(name => {
             const row = document.createElement('div');
-            row.style = 'display:flex; gap:6px; margin-bottom:6px; align-items:center;';
+            row.className = 'mcp-header-row mcp-cred-row';
             row.innerHTML = `
-                <span style="flex:1; font-size:0.9rem;">${escapeHtml(name)}</span>
+                <span class="mcp-cred-name">${escapeHtml(name)}</span>
                 <input type="password" class="form-input mcp-cred-header-value" data-name="${escapeAttr(name)}"
-                    placeholder="New value (blank = keep existing)" style="flex:1.5;">`;
+                    placeholder="New value (blank = keep existing)">`;
             headersList.appendChild(row);
         });
     } else {
-        headersSection.style.display = 'none';
+        headersSection.hidden = true;
     }
 
-    document.getElementById('mcpCredentialsModal').style.display = 'flex';
+    document.getElementById('mcpCredentialsModal').classList.add('active');
 }
 
 function closeMcpCredentialsModal() {
-    document.getElementById('mcpCredentialsModal').style.display = 'none';
+    document.getElementById('mcpCredentialsModal').classList.remove('active');
 }
 
 async function saveMcpCredentials() {
@@ -2938,7 +2937,7 @@ function renderBrowserSessionsSkeleton() {
                         <option value="header">Raw "Cookie:" header</option>
                     </select>
                 </div>
-                <div class="form-group" id="bs-domain-group" style="display:none;">
+                <div class="form-group" id="bs-domain-group" hidden>
                     <label for="bs-domain">Domain</label>
                     <input type="text" id="bs-domain" class="form-input" placeholder="example.com" autocomplete="off">
                     <small class="text-muted">Required for a raw Cookie header, which carries no domain.</small>
@@ -2957,7 +2956,7 @@ function renderBrowserSessionsSkeleton() {
                 </label>
                 <div class="browser-session-add-actions">
                     <button class="btn btn-primary" id="bs-save" onclick="saveBrowserSession()">Save session</button>
-                    <button class="btn btn-secondary" id="bs-cancel" style="display:none;" onclick="resetBrowserSessionForm()">Cancel</button>
+                    <button class="btn btn-secondary" id="bs-cancel" hidden onclick="resetBrowserSessionForm()">Cancel</button>
                 </div>
             </details>
         </div>
@@ -2982,7 +2981,7 @@ function browserSessionExpiry(s) {
     }
     const latest = new Date(s.latest_expiry);
     const days = Math.floor((latest - new Date()) / 86400000);
-    if (latest < new Date()) return { cls: 'error', text: 'Expired: re-import' };
+    if (latest < new Date()) return { cls: 'danger', text: 'Expired: re-import' };
     if (days < 7) return { cls: 'warning', text: `Expires in ${Math.max(days, 0)} d` };
     return { cls: 'success', text: `Valid until ${latest.toISOString().slice(0, 10)}` };
 }
@@ -3004,7 +3003,7 @@ function renderBrowserSessions() {
                 <div class="session-main">
                     <div class="session-title">
                         <strong>${escapeHtml(s.name)}</strong>
-                        <span class="session-badge session-badge-${exp.cls}">${escapeHtml(exp.text)}</span>
+                        <span class="badge badge-${exp.cls}">${escapeHtml(exp.text)}</span>
                     </div>
                     <div class="session-meta">
                         ${domains}
@@ -3026,7 +3025,7 @@ function renderBrowserSessions() {
 
 function onBrowserSessionFormatChange() {
     const fmt = document.getElementById('bs-format').value;
-    document.getElementById('bs-domain-group').style.display = fmt === 'header' ? 'block' : 'none';
+    document.getElementById('bs-domain-group').hidden = fmt !== 'header';
 }
 
 function onBrowserSessionFile(input) {
@@ -3057,7 +3056,7 @@ function resetBrowserSessionForm() {
     document.getElementById('bs-persist').disabled = false;
     document.getElementById('bs-file').value = '';
     document.getElementById('bs-save').textContent = 'Save session';
-    document.getElementById('bs-cancel').style.display = 'none';
+    document.getElementById('bs-cancel').hidden = true;
     document.getElementById('browser-session-add-summary').textContent = 'Add a session';
     document.getElementById('browser-session-add').open = false;
     onBrowserSessionFormatChange();
@@ -3074,7 +3073,7 @@ function startReplaceBrowserSession(id) {
     document.getElementById('bs-persist').checked = s.persist_updates;
     document.getElementById('bs-persist').disabled = true;
     document.getElementById('bs-save').textContent = 'Replace cookies';
-    document.getElementById('bs-cancel').style.display = 'inline-block';
+    document.getElementById('bs-cancel').hidden = false;
     document.getElementById('browser-session-add-summary').textContent = `Replace cookies for “${s.name}”`;
     const details = document.getElementById('browser-session-add');
     details.open = true;

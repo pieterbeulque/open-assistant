@@ -237,11 +237,11 @@ function formatFileSize(bytes) {
 function renderAttachmentChips() {
     if (!attachmentChips) return;
     if (attachedFiles.length === 0) {
-        attachmentChips.style.display = 'none';
+        attachmentChips.hidden = true;
         attachmentChips.innerHTML = '';
         return;
     }
-    attachmentChips.style.display = 'flex';
+    attachmentChips.hidden = false;
     attachmentChips.innerHTML = '';
     attachedFiles.forEach((f, idx) => {
         const chip = document.createElement('div');

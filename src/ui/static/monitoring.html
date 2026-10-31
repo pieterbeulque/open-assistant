@@ -206,13 +206,13 @@
                 <!-- Steps list -->
                 <div id="recipeStepsList" class="recipe-steps"></div>
 
-                <button class="btn btn-secondary btn-block" onclick="addRecipeStep()" style="margin-bottom:var(--space-2);">
+                <button class="btn btn-secondary btn-block" onclick="addRecipeStep()">
                     <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>
                     Add step
                 </button>
 
                 <!-- Legacy prompt fallback (hidden when steps present) -->
-                <div id="legacyPromptGroup" class="form-group" style="display:none">
+                <div id="legacyPromptGroup" class="form-group" hidden>
                     <label class="form-label" for="promptTextarea">Prompt</label>
                     <textarea id="promptTextarea" class="form-textarea" placeholder="Enter the prompt for this job..."></textarea>
                 </div>
@@ -369,29 +369,28 @@
                 const actionsHtml = data.logs.map(log => {
                     const details = log.details || {};
                     const statusIcon = icon(log.success ? 'circle-check' : 'circle-x');
-                    const statusColor = log.success ? 'var(--color-success-fg)' : 'var(--color-danger-fg)';
                     const execTime = details.execution_time_ms || 0;
 
                     return `
-                        <div class="log-entry" style="cursor: pointer;" onclick="toggleDetails('action-${log.id}')">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="log-entry log-entry-toggle" onclick="toggleDetails('action-${log.id}')">
+                            <div class="log-entry-head">
                                 <div>
-                                    <span style="color: ${statusColor}; margin-right: 8px; display: inline-flex; vertical-align: -3px;">${statusIcon}</span>
-                                    <span style="font-weight: 500;">${log.service_name || 'unknown'}</span>
-                                    <span style="margin: 0 8px; color: var(--text-muted);">•</span>
+                                    <span class="log-entry-status ${log.success ? 'text-success' : 'text-danger'}">${statusIcon}</span>
+                                    <span class="font-medium">${log.service_name || 'unknown'}</span>
+                                    <span class="log-entry-sep" aria-hidden="true">•</span>
                                     <span>${log.action}</span>
                                 </div>
                                 <div>
                                     <span class="log-timestamp">${formatDateTime(log.timestamp)}</span>
-                                    <span style="color: var(--text-muted); margin-left: 8px;">${execTime}ms</span>
+                                    <span class="log-entry-meta">${execTime}ms</span>
                                 </div>
                             </div>
-                            <div id="action-${log.id}" style="display: none; margin-top: 8px; padding: 8px; background: var(--background-secondary); border-radius: 4px; font-size: 0.85rem;">
-                                ${details.arguments ? `<div><strong>Arguments:</strong><pre style="margin: 4px 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(details.arguments, null, 2)}</pre></div>` : ''}
-                                ${details.result_summary ? `<div style="margin-top: 8px;"><strong>Result:</strong><pre style="margin: 4px 0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(details.result_summary, null, 2)}</pre></div>` : ''}
-                                ${log.error_message ? `<div style="color: var(--error-color); margin-top: 8px;"><strong>Error:</strong> ${log.error_message}</div>` : ''}
-                                ${details.tool_call_id ? `<div style="margin-top: 8px; color: var(--text-muted);"><strong>Tool call ID:</strong> ${details.tool_call_id}</div>` : ''}
-                                ${details.iteration ? `<div style="color: var(--text-muted);"><strong>Iteration:</strong> ${details.iteration}</div>` : ''}
+                            <div id="action-${log.id}" class="execution-details" hidden>
+                                ${details.arguments ? `<div><strong>Arguments:</strong><pre>${JSON.stringify(details.arguments, null, 2)}</pre></div>` : ''}
+                                ${details.result_summary ? `<div class="mt-1"><strong>Result:</strong><pre>${JSON.stringify(details.result_summary, null, 2)}</pre></div>` : ''}
+                                ${log.error_message ? `<div class="text-danger mt-1"><strong>Error:</strong> ${log.error_message}</div>` : ''}
+                                ${details.tool_call_id ? `<div class="text-secondary mt-1"><strong>Tool call ID:</strong> ${details.tool_call_id}</div>` : ''}
+                                ${details.iteration ? `<div class="text-secondary"><strong>Iteration:</strong> ${details.iteration}</div>` : ''}
                             </div>
                         </div>
                     `;
@@ -408,7 +407,7 @@
         function toggleDetails(id) {
             const elem = document.getElementById(id);
             if (elem) {
-                elem.style.display = elem.style.display === 'none' ? 'block' : 'none';
+                elem.hidden = !elem.hidden;
             }
         }
 
@@ -444,8 +443,8 @@
         };
 
         // CSS classes for log-stream-level, one per log level - see the
-        // .log-level-* rules above. Applied instead of an inline
-        // style="color:#hex" so the theme switch (light/dark/system)
+        // .log-level-* rules above. Applied instead of an inline colour
+        // so the theme switch (light/dark/system)
         // reaches log lines already on screen.
         const LOG_LEVEL_CLASSES = {
             DEBUG: 'log-level-debug',
@@ -560,7 +559,7 @@
 
             // Apply current filter visibility
             if (levelFilter && entry.dataset.level !== levelFilter) {
-                entry.style.display = 'none';
+                entry.hidden = true;
             }
 
             container.appendChild(entry);
@@ -576,7 +575,6 @@
             if (!container) return;
             const entry = document.createElement('div');
             entry.className = 'log-stream-status' + (isError ? ' log-stream-status-error' : '');
-            entry.style.padding = '4px 0';
             entry.textContent = text;
             container.appendChild(entry);
         }
@@ -585,7 +583,7 @@
             const filter = document.getElementById('logsLevelFilter')?.value || '';
             document.querySelectorAll('#logsContent .log-stream-entry').forEach(entry => {
                 const level = entry.dataset.level || '';
-                entry.style.display = (!filter || level === filter) ? '' : 'none';
+                entry.hidden = !(!filter || level === filter);
             });
             if (logsState.autoScroll) {
                 const terminal = document.getElementById('logsContainer');
@@ -679,10 +677,10 @@
                             return `
                             <tr>
                                 <td data-label="Name"><strong>${escapeHtml(job.name)}</strong></td>
-                                <td data-label="Schedule"><code style="font-size: 0.85rem;">${escapeHtml(job.cron_expression)}</code></td>
+                                <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
                                 <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
                                 <td data-label="Status">
-                                    <span class="status-badge-inline status-badge-${job.enabled ? 'enabled' : 'disabled'}">
+                                    <span class="badge ${job.enabled ? 'badge-on' : 'badge-off'}">
                                         ${job.enabled ? 'Enabled' : 'Disabled'}
                                     </span>
                                 </td>
@@ -794,7 +792,7 @@
                                 <td data-label="Scheduled time">${formatDateTime(task.scheduled_time)}</td>
                                 <td data-label="Type">${escapeHtml(task.job_type || 'unknown')}</td>
                                 <td data-label="Status">
-                                    <span class="status-badge-inline status-badge-${task.status}">
+                                    <span class="${statusBadgeClass(task.status)}">
                                         ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                                     </span>
                                 </td>
@@ -804,7 +802,7 @@
                                             <button class="job-action-btn btn-danger" onclick="cancelFutureTask('${task.task_id}')">
                                                 Cancel
                                             </button>
-                                        ` : '<span style="color:var(--text-muted)">—</span>'}
+                                        ` : '<span class="text-tertiary">—</span>'}
                                     </div>
                                 </td>
                             </tr>
@@ -883,11 +881,6 @@
                                 ? Math.round((new Date(exec.completed_at) - new Date(exec.started_at)) / 1000)
                                 : 'N/A';
 
-                            const statusBadge = exec.status === 'success' ? 'success'
-                                : exec.status === 'failed' ? 'failed'
-                                : exec.status === 'cancelled' ? 'cancelled'
-                                : exec.status === 'skipped' ? 'skipped'
-                                : 'running';
                             const statusText = exec.status.charAt(0).toUpperCase() + exec.status.slice(1);
 
                             return `
@@ -897,7 +890,7 @@
                                     <td data-label="Started">${formatDateTime(exec.started_at)}</td>
                                     <td data-label="Duration">${duration !== 'N/A' ? duration + 's' : duration}</td>
                                     <td data-label="Status">
-                                        <span class="status-badge-inline status-badge-${statusBadge}">
+                                        <span class="${statusBadgeClass(exec.status)}">
                                             ${statusText}
                                         </span>
                                     </td>
@@ -907,16 +900,16 @@
                                             <button class="job-action-btn" onclick="toggleExecutionDetails('exec-${idx}')">
                                                 Show details
                                             </button>
-                                        ` : '<span style="color:var(--text-muted)">—</span>'}
+                                        ` : '<span class="text-tertiary">—</span>'}
                                         </div>
                                     </td>
                                 </tr>
                                 ${exec.error_message || exec.result ? `
-                                    <tr id="exec-${idx}" style="display: none;">
+                                    <tr id="exec-${idx}" hidden>
                                         <td colspan="6">
                                             <div class="execution-details">
                                                 ${exec.error_message ? `
-                                                    <div style="color: var(--error-color);">
+                                                    <div class="text-danger">
                                                         <strong>Error:</strong>
                                                         <pre>${exec.error_message}</pre>
                                                     </div>
@@ -943,7 +936,7 @@
         function toggleExecutionDetails(id) {
             const elem = document.getElementById(id);
             if (elem) {
-                elem.style.display = elem.style.display === 'none' ? '' : 'none';
+                elem.hidden = !elem.hidden;
             }
         }
 
@@ -962,11 +955,11 @@
 
             if (job.steps && job.steps.length > 0) {
                 recipeSteps = job.steps.map(s => Object.assign({}, s));
-                document.getElementById('legacyPromptGroup').style.display = 'none';
+                document.getElementById('legacyPromptGroup').hidden = true;
             } else {
                 // Legacy prompt job — wrap in a single step for editing
                 recipeSteps = [{ order: 1, description: job.name, prompt_template: job.prompt || '' }];
-                document.getElementById('legacyPromptGroup').style.display = 'none';
+                document.getElementById('legacyPromptGroup').hidden = true;
             }
             renderStepsList();
             document.getElementById('editPromptModal').classList.add('active');
@@ -975,35 +968,35 @@
         function renderStepsList() {
             const container = document.getElementById('recipeStepsList');
             container.innerHTML = recipeSteps.map((step, idx) => `
-                <div style="border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:var(--color-bg)">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <strong style="font-size:0.85rem">Step ${step.order}</strong>
+                <div class="recipe-step">
+                    <div class="recipe-step-head">
+                        <strong>Step ${step.order}</strong>
                         ${trashButton(`removeRecipeStep(${idx})`, 'Remove step')}
                     </div>
-                    <div class="form-group" style="margin-bottom:8px">
-                        <label class="form-label" style="font-size:0.8rem">Description</label>
-                        <input class="form-input" value="${escapeHtml(step.description||'')}" oninput="updateStep(${idx},'description',this.value)" style="font-size:0.85rem">
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <input class="form-input" value="${escapeHtml(step.description||'')}" oninput="updateStep(${idx},'description',this.value)">
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-                        <div class="form-group" style="margin:0">
-                            <label class="form-label" style="font-size:0.8rem">Pinned tool <span style="color:var(--text-secondary)">(optional)</span></label>
-                            <input class="form-input" value="${escapeHtml(step.tool_name||'')}" placeholder="e.g. google_calendar_list_events" oninput="updateStep(${idx},'tool_name',this.value||null)" style="font-size:0.85rem">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Pinned tool <span class="text-secondary">(optional)</span></label>
+                            <input class="form-input" value="${escapeHtml(step.tool_name||'')}" placeholder="e.g. google_calendar_list_events" oninput="updateStep(${idx},'tool_name',this.value||null)">
                         </div>
-                        <div class="form-group" style="margin:0">
-                            <label class="form-label" style="font-size:0.8rem">Stores result as</label>
-                            <input class="form-input" value="${escapeHtml(step.stores_as||'')}" placeholder="variable_name" oninput="updateStep(${idx},'stores_as',this.value||null)" style="font-size:0.85rem">
+                        <div class="form-group">
+                            <label class="form-label">Stores result as</label>
+                            <input class="form-input" value="${escapeHtml(step.stores_as||'')}" placeholder="variable_name" oninput="updateStep(${idx},'stores_as',this.value||null)">
                         </div>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-                        <div class="form-group" style="margin:0">
-                            <label class="form-label" style="font-size:0.8rem">Uses variable</label>
-                            <input class="form-input" value="${escapeHtml(step.uses_variable||'')}" placeholder="from prior step" oninput="updateStep(${idx},'uses_variable',this.value||null)" style="font-size:0.85rem">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Uses variable</label>
+                            <input class="form-input" value="${escapeHtml(step.uses_variable||'')}" placeholder="from prior step" oninput="updateStep(${idx},'uses_variable',this.value||null)">
                         </div>
                     </div>
                     ${!step.tool_name ? `
-                    <div class="form-group" style="margin:0">
-                        <label class="form-label" style="font-size:0.8rem">Prompt template <span style="color:var(--text-secondary)">(used when no tool is pinned)</span></label>
-                        <textarea class="form-textarea" style="font-size:0.85rem;min-height:80px" oninput="updateStep(${idx},'prompt_template',this.value)">${escapeHtml(step.prompt_template||'')}</textarea>
+                    <div class="form-group">
+                        <label class="form-label">Prompt template <span class="text-secondary">(used when no tool is pinned)</span></label>
+                        <textarea class="form-textarea" oninput="updateStep(${idx},'prompt_template',this.value)">${escapeHtml(step.prompt_template||'')}</textarea>
                     </div>` : ''}
                 </div>
             `).join('');
@@ -1228,7 +1221,7 @@
             parts.push(`<div class="graph-node graph-node--trigger">
                 <div class="graph-node-head">
                     <span class="graph-node-title">${icon('timer')}Trigger: scheduled run</span>
-                    <span class="graph-badge graph-badge--tool"><code style="color:inherit">${escapeHtml(job.cron_expression || '')}</code></span>
+                    <span class="graph-badge graph-badge--tool"><code>${escapeHtml(job.cron_expression || '')}</code></span>
                 </div>
             </div>`);
 

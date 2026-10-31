@@ -329,7 +329,6 @@
     border-radius: 50%;
     background: var(--color-sunken);
     color: var(--color-text-tertiary);
-    font-size: 0.7rem;
     font-weight: var(--weight-bold);
     line-height: 1;
 }
@@ -632,7 +631,6 @@
     border-radius: var(--radius-sm);
     background: none;
     color: var(--color-text-tertiary);
-    font-size: 1rem;
     line-height: 1;
     cursor: pointer;
 }

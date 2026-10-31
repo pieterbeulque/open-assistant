@@ -31,7 +31,7 @@ const INSTANCE_BASE = window.INSTANCE_BASE_PATH || '';
 // To add an icon: copy the inner elements of lucide-static/icons/<name>.svg
 // into a new <symbol id="icon-<name>" viewBox="0 0 24 24">.
 const ICON_SPRITE = `
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true">
     <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
     <symbol id="icon-artifacts" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/> <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/> <path d="M10 12h4"/></symbol>
     <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/> <circle cx="12" cy="12" r="3"/></symbol>
@@ -135,6 +135,20 @@ function trashButton(onclick, label = 'Delete', classes = 'btn btn-danger btn-sm
     return `<button type="button" class="${cls}" onclick="${onclick}" title="${safe}" aria-label="${safe}">${icon('trash')}</button>`;
 }
 window.trashButton = trashButton;
+
+// Badge classes for a job/run status. Only outcomes get colour (see
+// docs/design-system.md): success and failure are tinted, everything
+// in between (pending, running, cancelled, skipped) stays neutral.
+const STATUS_BADGE_TONES = {
+    success: 'success',
+    completed: 'success',
+    failed: 'danger',
+    error: 'danger',
+};
+function statusBadgeClass(status) {
+    return `badge badge-${STATUS_BADGE_TONES[status] || 'neutral'}`;
+}
+window.statusBadgeClass = statusBadgeClass;
 
 // Brand mark: a rounded tile in the accent colour with a simple, friendly
 // face. Drawn with currentColor/var() so it follows the theme and any
