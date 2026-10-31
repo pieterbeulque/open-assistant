@@ -695,7 +695,9 @@
                                 <td data-label="Next run">${job.next_run_at ? formatDateTime(job.next_run_at) : 'N/A'}</td>
                                 <td data-label="Actions">
                                     <div class="job-actions">
-                                        <button class="job-action-btn job-action-icon" onclick="openRecipeGraphModal('${job.job_id}')" title="View recipe flow" aria-label="View recipe flow">${icon('workflow')}</button>
+                                        <button class="job-action-btn" onclick="openRecipeGraphModal('${job.job_id}')" title="See the recipe's steps as a diagram">
+                                            View flow
+                                        </button>
                                         <button class="job-action-btn" onclick="openEditPromptModal('${job.job_id}')">
                                             Edit recipe
                                         </button>
