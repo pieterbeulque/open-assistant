@@ -694,7 +694,7 @@ async function createIntegrationCard(serviceName) {
         const isOAuthService = serviceName === 'google' || serviceName === 'outlook' || serviceName === 'google_ads';
 
         // Build action buttons HTML
-        // In managed mode, some services only get Test Connection button (no Save Settings)
+        // In managed mode, some services only get Test connection button (no Save settings)
         const isManagedOnlyService = isManaged && ['google_navigator', 'brave', 'whisper', 'mistral_ocr'].includes(serviceName);
         // Services that need no configuration beyond the enable toggle (no credentials, no settings)
         const isNoConfigService = serviceName === 'yahoo_finance';
@@ -709,10 +709,10 @@ async function createIntegrationCard(serviceName) {
                     Authenticate ${serviceName.charAt(0).toUpperCase() + serviceName.slice(1)}
                 </button>
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    Test Connection
+                    Test connection
                 </button>
                 ${(!isManaged || managedFields.length === 0) ? `<button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    Save Settings
+                    Save settings
                 </button>` : ''}
             `;
         } else if (serviceName === 'whatsapp') {
@@ -721,25 +721,25 @@ async function createIntegrationCard(serviceName) {
                     Link WhatsApp
                 </button>
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    Test Connection
+                    Test connection
                 </button>
                 <button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    Save Settings
+                    Save settings
                 </button>
             `;
         } else if (isNoConfigService) {
             actionButtonsHtml = `
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    Test Connection
+                    Test connection
                 </button>
             `;
         } else {
             actionButtonsHtml = `
                 <button onclick="testConnection('${serviceName}')" class="btn btn-secondary">
-                    Test Connection
+                    Test connection
                 </button>
                 ${!isManagedOnlyService ? `<button onclick="saveIntegration('${serviceName}')" class="btn btn-primary">
-                    Save Settings
+                    Save settings
                 </button>` : ''}
             `;
         }
@@ -747,9 +747,8 @@ async function createIntegrationCard(serviceName) {
         card.innerHTML = `
             <div class="integration-header" onclick="toggleIntegrationExpanded('${serviceName}')">
                 <div class="integration-title">
-                    <span class="integration-icon">${getServiceIcon(serviceName)}</span>
+                    <span class="integration-icon">${getServiceIcon(serviceName)}<span class="expand-icon">${icon('chevron-down')}</span></span>
                     <h4>${getServiceDisplayName(serviceName)}</h4>
-                    <span class="expand-icon">${icon('chevron-down')}</span>
                 </div>
                 <label class="toggle-label" onclick="event.stopPropagation()">
                     <input
@@ -1185,11 +1184,11 @@ async function exportSettings() {
 }
 
 async function resetAllSettings() {
-    if (!confirm('Are you sure you want to reset ALL settings to defaults? This cannot be undone.')) {
-        return;
-    }
-
-    if (!confirm('This will delete all settings from the database. Are you REALLY sure?')) {
+    if (!await modal.ask(
+        'Reset all settings?',
+        'Every setting goes back to its default and all stored settings are deleted from the database. This cannot be undone.',
+        { confirmText: 'Reset all settings', danger: true }
+    )) {
         return;
     }
 
@@ -1699,9 +1698,9 @@ function createAgentCard(agent, index, total) {
             </div>
             <div class="agent-footer">
                 <button onclick="openAgentModal('${agent.name}')" class="btn btn-secondary btn-sm">
-                    Edit Prompt
+                    Edit prompt
                 </button>
-                ${!isCoordinator ? `<button onclick="deleteAgent('${agent.name}')" class="btn btn-danger btn-sm">Remove</button>` : ''}
+                ${!isCoordinator ? trashButton(`deleteAgent('${agent.name}')`, 'Remove agent') : ''}
             </div>
         </div>
     `;
@@ -1736,10 +1735,10 @@ function createMcpAgentCard(agent, index, total) {
 
     const footerButtons = authType === 'oauth2'
         ? `<button onclick="connectMcpOAuth('${serverId}')" class="btn btn-secondary btn-sm">Connect via OAuth</button>
-           <button onclick="refreshMcpServer('${serverId}')" class="btn btn-secondary btn-sm">Refresh Tools</button>
+           <button onclick="refreshMcpServer('${serverId}')" class="btn btn-secondary btn-sm">Refresh tools</button>
            <button onclick="openMcpEditModal('${serverId}')" class="btn btn-secondary btn-sm">Edit</button>`
         : `<button onclick="openMcpCredentialsModal('${serverId}')" class="btn btn-secondary btn-sm">Credentials</button>
-           <button onclick="refreshMcpServer('${serverId}')" class="btn btn-secondary btn-sm">Refresh Tools</button>
+           <button onclick="refreshMcpServer('${serverId}')" class="btn btn-secondary btn-sm">Refresh tools</button>
            <button onclick="openMcpEditModal('${serverId}')" class="btn btn-secondary btn-sm">Edit</button>`;
 
     const upDisabled = index === 0 ? 'disabled' : '';
@@ -1783,7 +1782,7 @@ function createMcpAgentCard(agent, index, total) {
             </div>
             <div class="agent-footer">
                 ${footerButtons}
-                <button onclick="deleteAgent('${escapeAttr(agent.name)}')" class="btn btn-danger btn-sm">Remove</button>
+                ${trashButton(`deleteAgent('${escapeAttr(agent.name)}')`, 'Remove MCP server')}
             </div>
         </div>
     `;
@@ -1892,12 +1891,12 @@ async function refreshMcpServer(serverId) {
     } catch (error) {
         toast.error('Refresh failed: ' + (error.message || 'Unknown error'));
     } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Refresh Tools'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Refresh tools'; }
     }
 }
 
 async function deleteAgent(agentName) {
-    if (!confirm(`Are you sure you want to remove the "${agentName}" agent? This cannot be undone.`)) {
+    if (!await modal.ask('Remove agent?', `Remove the "${agentName}" agent? This cannot be undone.`, { confirmText: 'Remove', danger: true })) {
         return;
     }
 
@@ -2007,7 +2006,7 @@ async function resetAgentToDefault() {
             return;
         }
 
-        if (!confirm(`Reset ${agentName} agent to default configuration?`)) {
+        if (!await modal.ask('Reset agent?', `Reset the "${agentName}" agent to its default configuration? Your changes to it will be lost.`, { confirmText: 'Reset', danger: true })) {
             return;
         }
 
@@ -2268,11 +2267,11 @@ function createPluginCard(plugin) {
     card.id = `plugin-card-${plugin.id}`;
 
     const authLabel = {
-        bearer: 'Bearer Token',
-        header: 'API Key Header',
-        basic: 'Basic Auth',
-        api_key_with_jwt: 'API Key + JWT',
-        query: 'API Key (Query Param)'
+        bearer: 'Bearer token',
+        header: 'API key header',
+        basic: 'Basic auth',
+        api_key_with_jwt: 'API key + JWT',
+        query: 'API key (query param)'
     }[plugin.auth_type] || plugin.auth_type;
 
     // Build credential fields based on auth type
@@ -2280,7 +2279,7 @@ function createPluginCard(plugin) {
     if (plugin.auth_type === 'bearer' || plugin.auth_type === 'header' || plugin.auth_type === 'query') {
         credentialFields = `
             <div class="form-group">
-                <label class="form-label">API Token / Secret</label>
+                <label class="form-label">API token / secret</label>
                 <div class="input-group">
                     <input type="password" id="plugin-token-${plugin.id}" class="form-input masked-input"
                         placeholder="Enter token..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
@@ -2292,7 +2291,7 @@ function createPluginCard(plugin) {
             // Fixed-password basic auth (e.g. Toggl): only need the token/username
             credentialFields = `
                 <div class="form-group">
-                    <label class="form-label">API Token</label>
+                    <label class="form-label">API token</label>
                     <div class="input-group">
                         <input type="password" id="plugin-token-${plugin.id}" class="form-input masked-input"
                             placeholder="Enter API token..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
@@ -2322,7 +2321,7 @@ function createPluginCard(plugin) {
         // Static API key header + JWT obtained via username/password login
         credentialFields = `
             <div class="form-group">
-                <label class="form-label">API Key <span class="text-muted">(sent as static header on every request)</span></label>
+                <label class="form-label">API key <span class="text-muted">(sent as static header on every request)</span></label>
                 <div class="input-group">
                     <input type="password" id="plugin-apikey-${plugin.id}" class="form-input masked-input"
                         placeholder="Enter API key..." value="${plugin.has_credentials ? '***MASKED***' : ''}">
@@ -2379,9 +2378,8 @@ function createPluginCard(plugin) {
     card.innerHTML = `
         <div class="integration-header" onclick="togglePluginCard('${plugin.id}')">
             <div class="integration-title">
-                <span class="integration-icon">${icon('puzzle')}</span>
+                <span class="integration-icon">${icon('puzzle')}<span class="expand-icon" id="plugin-chevron-${plugin.id}">${icon('chevron-down')}</span></span>
                 <h4>${plugin.display_name}<span class="integration-subtitle">${authLabel} · ${plugin.endpoint_count} tool${plugin.endpoint_count !== 1 ? 's' : ''}</span>${isBuiltin ? '' : '<span class="badge badge-outline badge-sm">Custom</span>'}</h4>
-                <span class="expand-icon" id="plugin-chevron-${plugin.id}">${icon('chevron-down')}</span>
             </div>
             <label class="toggle-label" onclick="event.stopPropagation()">
                 <input type="checkbox" class="toggle-input" id="plugin-enabled-${plugin.id}"
@@ -2398,9 +2396,9 @@ function createPluginCard(plugin) {
 
             <div class="integration-actions">
                 <button onclick="savePluginCredentials('${plugin.id}')" class="btn btn-primary">Save</button>
-                <button onclick="testPluginConnection('${plugin.id}')" class="btn btn-secondary">Test Connection</button>
+                <button onclick="testPluginConnection('${plugin.id}')" class="btn btn-secondary">Test connection</button>
                 ${!isBuiltin ? `<button onclick="showEditPluginModal('${plugin.id}')" class="btn btn-secondary">Edit JSON</button>` : ''}
-                ${!isBuiltin ? `<button onclick="deletePlugin('${plugin.id}')" class="btn btn-danger">Delete</button>` : ''}
+                ${!isBuiltin ? trashButton(`deletePlugin('${plugin.id}')`, 'Delete plugin', 'btn btn-danger btn-icon') : ''}
             </div>
             <div id="plugin-status-${plugin.id}" style="margin-top:8px;"></div>
         </div>`;
@@ -2516,7 +2514,7 @@ async function testPluginConnection(pluginId) {
 }
 
 async function deletePlugin(pluginId) {
-    if (!confirm(`Delete plugin "${pluginId}"? This cannot be undone.`)) return;
+    if (!await modal.ask('Delete plugin?', `Delete the "${pluginId}" plugin? This cannot be undone.`, { confirmText: 'Delete', danger: true })) return;
     try {
         await api.delete(`/api/plugins/${pluginId}`);
         const card = document.getElementById(`plugin-card-${pluginId}`);
@@ -2535,16 +2533,16 @@ function showAddPluginModal() {
     _editingPluginId = null;
     document.getElementById('plugin-json-input').value = '';
     document.getElementById('plugin-json-error').style.display = 'none';
-    document.getElementById('plugin-modal-title').textContent = 'Install Custom Plugin';
-    document.getElementById('plugin-modal-save-btn').textContent = 'Validate & Install';
+    document.getElementById('plugin-modal-title').textContent = 'Install custom plugin';
+    document.getElementById('plugin-modal-save-btn').textContent = 'Validate and install';
     document.getElementById('addPluginModal').style.display = 'flex';
 }
 
 async function showEditPluginModal(pluginId) {
     _editingPluginId = pluginId;
     document.getElementById('plugin-json-error').style.display = 'none';
-    document.getElementById('plugin-modal-title').textContent = 'Edit Plugin JSON';
-    document.getElementById('plugin-modal-save-btn').textContent = 'Validate & Save';
+    document.getElementById('plugin-modal-title').textContent = 'Edit plugin JSON';
+    document.getElementById('plugin-modal-save-btn').textContent = 'Validate and save';
     document.getElementById('plugin-json-input').value = 'Loading...';
     document.getElementById('addPluginModal').style.display = 'flex';
 
@@ -2687,7 +2685,7 @@ function addMcpHeaderRow(name = '', value = '') {
             value="${escapeAttr(name)}" style="flex:1;">
         <input type="password" class="form-input mcp-header-value" placeholder="Value"
             value="${escapeAttr(value)}" style="flex:1;">
-        <button type="button" class="btn-icon" onclick="this.parentElement.remove()" title="Remove header" aria-label="Remove header"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>`;
+        ${trashButton('this.parentElement.remove()', 'Remove header', 'btn btn-danger btn-icon')}`;
     list.appendChild(row);
 }
 
@@ -2711,7 +2709,7 @@ async function createMcpServer() {
         toast.error('Server ID must be lowercase letters, digits, and underscores, starting with a letter');
         return;
     }
-    if (!displayName) { toast.error('Display Name is required'); return; }
+    if (!displayName) { toast.error('Display name is required'); return; }
     if (!/^https?:\/\//.test(url)) { toast.error('URL must start with http:// or https://'); return; }
 
     const keywords = document.getElementById('new-mcp-keywords').value
@@ -2751,7 +2749,7 @@ async function createMcpServer() {
         settingsState.agentsLoaded = true;
         // For OAuth servers, prompt the user to connect immediately.
         if (authType === 'oauth2') {
-            if (confirm(`'${server.display_name}' was added. Connect via OAuth now to authorize access?`)) {
+            if (await modal.ask('Connect now?', `"${server.display_name}" was added. Connect via OAuth now to authorize access?`, { confirmText: 'Connect', cancelText: 'Later' })) {
                 connectMcpOAuth(server.id);
             }
         }
@@ -2759,7 +2757,7 @@ async function createMcpServer() {
         toast.error(`Failed to add server: ${error.message}`);
     } finally {
         btn.disabled = false;
-        btn.textContent = 'Connect & Add';
+        btn.textContent = 'Connect and add';
     }
 }
 
@@ -2846,7 +2844,7 @@ async function saveMcpEdit() {
 function openMcpCredentialsModal(serverId) {
     const srv = (settingsState.mcpServers || {})[`mcp_${serverId}`] || {};
     document.getElementById('mcp-creds-server-id').value = serverId;
-    document.getElementById('mcp-creds-title').textContent = `Update Credentials — ${srv.display_name || serverId}`;
+    document.getElementById('mcp-creds-title').textContent = `Update credentials — ${srv.display_name || serverId}`;
 
     const headersSection = document.getElementById('mcp-creds-headers-section');
     const headersList = document.getElementById('mcp-creds-headers-list');
@@ -3020,7 +3018,7 @@ function renderBrowserSessions() {
                         onchange="updateBrowserSession('${id}', {persist_updates: this.checked})"> Keep refreshed</label>
                     <button class="btn btn-secondary btn-sm" onclick="testBrowserSession('${id}')">Test</button>
                     <button class="btn btn-secondary btn-sm" onclick="startReplaceBrowserSession('${id}')">Replace</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteBrowserSession('${id}')">Delete</button>
+                    ${trashButton(`deleteBrowserSession('${id}')`, 'Delete session')}
                 </div>
             </div>`;
     }).join('');
@@ -3158,7 +3156,7 @@ async function testBrowserSession(id) {
 async function deleteBrowserSession(id) {
     const s = browserSessionsState.sessions.find(x => x.id === id);
     if (!s) return;
-    if (!window.confirm(`Delete “${s.name}”?\n\nThis only removes the cookies stored here. To fully revoke access, also log out of the site or end the session in its security settings.`)) {
+    if (!await modal.ask(`Delete “${s.name}”?`, 'This only removes the cookies stored here. To fully revoke access, also log out of the site or end the session in its security settings.', { confirmText: 'Delete', danger: true })) {
         return;
     }
     try {

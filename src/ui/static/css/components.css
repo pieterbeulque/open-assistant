@@ -142,6 +142,21 @@
     --_btn-border-hover: var(--color-danger-fg);
 }
 
+/* Destructive confirmation: the one place red is a solid fill. Use it
+   for the confirm button of a "delete / reset / stop" dialog only. */
+.btn-destructive {
+    --_btn-bg: var(--color-danger-emphasis);
+    --_btn-fg: var(--color-on-danger);
+    --_btn-border: var(--color-danger-emphasis);
+    --_btn-bg-hover: var(--color-danger-emphasis-hover);
+    --_btn-border-hover: var(--color-danger-emphasis-hover);
+    box-shadow: var(--shadow-xs);
+}
+
+.btn-destructive:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger-emphasis) 30%, transparent);
+}
+
 .btn-success {
     --_btn-bg: var(--color-success-bg);
     --_btn-fg: var(--color-success-fg);
@@ -216,16 +231,53 @@
     filter: grayscale(1);
 }
 
-.icon-btn-sm {
+.icon-btn-sm,
+.btn-icon.btn-sm {
     width: var(--control-h-sm);
+    min-width: var(--control-h-sm);
     height: var(--control-h-sm);
+    min-height: var(--control-h-sm);
     border-radius: var(--radius-sm);
+}
+
+/* .btn + variant + .btn-icon: a square button that keeps the variant's
+   colours (e.g. the shaded red trash button: .btn .btn-danger .btn-icon). */
+.btn.btn-icon {
+    min-width: var(--control-h-md);
+    min-height: var(--control-h-md);
+    border-color: var(--_btn-border);
+    background: var(--_btn-bg);
+    color: var(--_btn-fg);
+}
+
+.btn.btn-icon.btn-sm {
+    min-width: var(--control-h-sm);
+    min-height: var(--control-h-sm);
+}
+
+.btn.btn-icon:hover:not(:disabled) {
+    border-color: var(--_btn-border-hover);
+    background: var(--_btn-bg-hover);
+    color: var(--_btn-fg);
+}
+
+.btn-icon .icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* A plain .btn without a variant stays quiet when used as an icon button */
+.btn.btn-icon:not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.btn-success):not(.btn-warning):not(.btn-destructive) {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-text-secondary);
 }
 
 .button-group,
 .btn-row {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
     gap: var(--space-2);
 }
 
@@ -314,8 +366,8 @@ textarea.form-input,
 .form-textarea:focus,
 .form-control:focus {
     outline: none;
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-focus-ring);
+    border-color: var(--color-focus-border);
+    box-shadow: 0 0 0 3px var(--color-focus-ring-soft);
 }
 
 .form-input:disabled,
@@ -335,7 +387,7 @@ textarea.form-input,
 
 .form-input[aria-invalid="true"]:focus,
 .form-input.is-invalid:focus {
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger-fg) 22%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-danger-fg) 12%, transparent);
 }
 
 select.form-select,
@@ -940,6 +992,10 @@ input[type="radio"] {
     padding: 0;
 }
 
+.modal-overlay > .modal .modal-body p + p {
+    margin-top: var(--space-3);
+}
+
 .modal-overlay > .modal {
     max-width: 460px;
     align-items: stretch;
@@ -1210,15 +1266,51 @@ input[type="radio"] {
 .table-scroll,
 .jobs-table-wrap {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Inline row actions */
+/* Desktop column sizing: data columns hug their content and never wrap;
+   the last column takes up the remaining width (its actions sit flush
+   right). When the content is wider than the container, the wrapper
+   above scrolls horizontally instead of squashing the columns. */
+@media (min-width: 769px) {
+    .table th:not(:last-child),
+    .table td:not(:last-child),
+    .jobs-table th:not(:last-child),
+    .jobs-table td:not(:last-child),
+    .audit-table th:not(:last-child),
+    .audit-table td:not(:last-child) {
+        white-space: nowrap;
+    }
+
+    .table th:last-child,
+    .table td:last-child,
+    .jobs-table th:last-child,
+    .jobs-table td:last-child,
+    .audit-table th:last-child,
+    .audit-table td:last-child {
+        width: 100%;
+    }
+
+    /* An actions column is right-aligned, header included */
+    .table td:last-child:has(> .row-actions, > .job-actions),
+    .jobs-table td:last-child:has(> .row-actions, > .job-actions),
+    .table:has(td:last-child > .row-actions, td:last-child > .job-actions) th:last-child,
+    .jobs-table:has(td:last-child > .row-actions, td:last-child > .job-actions) th:last-child {
+        text-align: right;
+    }
+}
+
+/* Inline row actions - always right-aligned */
 .job-actions,
 .row-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
     gap: var(--space-1-5);
 }
 
@@ -1250,14 +1342,27 @@ input[type="radio"] {
 }
 
 .job-action-btn.btn-danger {
-    background: transparent;
+    background: var(--color-danger-bg);
     border-color: var(--color-danger-border);
     color: var(--color-danger-fg);
 }
 
 .job-action-btn.btn-danger:hover:not(:disabled) {
-    background: var(--color-danger-bg);
+    background: color-mix(in oklab, var(--color-danger-bg) 70%, var(--color-danger-border));
     border-color: var(--color-danger-fg);
+}
+
+/* Square icon-only row action (e.g. the trash button) */
+.job-action-icon {
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
+
+.job-action-icon .icon {
+    width: 14px;
+    height: 14px;
 }
 
 .job-action-btn.btn-warning {
@@ -1345,12 +1450,19 @@ input[type="radio"] {
         text-align: left;
     }
 
-    .job-actions {
+    .job-actions,
+    .row-actions {
+        flex-wrap: wrap;
         justify-content: flex-end;
     }
 
     .job-action-btn {
         min-height: 36px;
+    }
+
+    .job-action-icon {
+        width: 36px;
+        height: 36px;
     }
 }
 
@@ -1504,6 +1616,7 @@ input[type="radio"] {
 
 .page-header p,
 .page-description {
+    max-width: 60ch;
     margin-top: var(--space-1);
     color: var(--color-text-secondary);
     font-size: var(--text-base);
@@ -1573,6 +1686,7 @@ p.text-muted {
 .mb-1 { margin-bottom: var(--space-2); }
 .mb-2 { margin-bottom: var(--space-4); }
 .mb-3 { margin-bottom: var(--space-6); }
+.mb-0 { margin-bottom: 0; }
 
 .flex { display: flex; }
 .flex-col { display: flex; flex-direction: column; }

@@ -119,12 +119,16 @@ const toast = new ToastManager();
 
 // Modal Manager
 class ModalManager {
-    show(title, content, buttons = []) {
+    // buttons: [{ text, className, onClick }]. onDismiss runs when the dialog
+    // closes without a button (overlay click or Escape).
+    show(title, content, buttons = [], onDismiss = null) {
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
 
         const modal = document.createElement('div');
         modal.className = 'modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
 
         const header = document.createElement('div');
         header.className = 'modal-header';
@@ -141,15 +145,41 @@ class ModalManager {
         const footer = document.createElement('div');
         footer.className = 'modal-footer';
 
+        let settled = false;
+        const onKey = (e) => {
+            if (e.key === 'Escape') dismiss();
+        };
+        const finish = () => {
+            settled = true;
+            document.removeEventListener('keydown', onKey);
+            this.close(overlay);
+        };
+        const dismiss = () => {
+            if (settled) return;
+            finish();
+            if (onDismiss) onDismiss();
+        };
+
+        let lastButton = null;
         buttons.forEach(btn => {
             const button = document.createElement('button');
             button.className = `btn ${btn.className || 'btn-secondary'}`;
-            button.textContent = btn.text;
+            if (btn.icon) {
+                // Icon-only button: the text becomes the tooltip and accessible name
+                button.classList.add('btn-icon');
+                button.innerHTML = icon(btn.icon);
+                button.title = btn.text;
+                button.setAttribute('aria-label', btn.text);
+            } else {
+                button.textContent = btn.text;
+            }
             button.onclick = () => {
+                if (settled) return;
+                finish();
                 if (btn.onClick) btn.onClick();
-                this.close(overlay);
             };
             footer.appendChild(button);
+            lastButton = button;
         });
 
         modal.appendChild(header);
@@ -158,12 +188,12 @@ class ModalManager {
         overlay.appendChild(modal);
 
         document.body.appendChild(overlay);
+        document.addEventListener('keydown', onKey);
+        if (lastButton) setTimeout(() => lastButton.focus(), 0);
 
         // Close on overlay click
         overlay.onclick = (e) => {
-            if (e.target === overlay) {
-                this.close(overlay);
-            }
+            if (e.target === overlay) dismiss();
         };
 
         return overlay;
@@ -174,18 +204,40 @@ class ModalManager {
         setTimeout(() => overlay.remove(), 200);
     }
 
-    confirm(title, message, onConfirm) {
+    // Callback style. options: { confirmText, cancelText, danger }
+    confirm(title, message, onConfirm, options = {}) {
+        const { confirmText = 'Confirm', cancelText = 'Cancel', danger = false } = options;
         return this.show(title, message, [
+            { text: cancelText, className: 'btn-secondary' },
             {
-                text: 'Cancel',
-                className: 'btn-secondary'
-            },
-            {
-                text: 'Confirm',
-                className: 'btn-primary',
+                text: confirmText,
+                className: danger ? 'btn-destructive' : 'btn-primary',
                 onClick: onConfirm
             }
         ]);
+    }
+
+    // Promise style, a drop-in for window.confirm():
+    //   if (!await modal.ask('Delete plugin', 'This cannot be undone.', { danger: true, confirmText: 'Delete' })) return;
+    // `message` is plain text; blank lines start a new paragraph.
+    ask(title, message, options = {}) {
+        const { confirmText = 'Confirm', cancelText = 'Cancel', danger = false } = options;
+        const content = document.createElement('div');
+        String(message || '').split(/\n\s*\n/).forEach(text => {
+            const p = document.createElement('p');
+            p.textContent = text.trim();
+            content.appendChild(p);
+        });
+        return new Promise(resolve => {
+            this.show(title, content, [
+                { text: cancelText, className: 'btn-secondary', onClick: () => resolve(false) },
+                {
+                    text: confirmText,
+                    className: danger ? 'btn-destructive' : 'btn-primary',
+                    onClick: () => resolve(true)
+                }
+            ], () => resolve(false));
+        });
     }
 }
 

@@ -148,13 +148,13 @@
         <!-- BUTTONS -->
         <section class="ds-section" id="buttons">
             <h2>Buttons</h2>
-            <p class="ds-lead">One primary action per area. Secondary for everything else, ghost for low-emphasis actions, danger for destructive ones.</p>
+            <p class="ds-lead">One primary action per area. Secondary for everything else, ghost for low-emphasis actions. Delete and remove are always a shaded red trash button; the solid red button is only for confirming a destructive dialog. Icon buttons are square, and button groups are right-aligned.</p>
             <div class="card">
                 <div class="ds-row">
                     <button class="btn btn-primary">Save changes</button>
                     <button class="btn btn-secondary">Test connection</button>
                     <button class="btn btn-ghost">Cancel</button>
-                    <button class="btn btn-danger">Delete</button>
+                    <button class="btn btn-destructive">Yes, delete</button>
                     <button class="btn btn-success">Approve</button>
                     <button class="btn btn-primary" disabled>Disabled</button>
                 </div>
@@ -163,9 +163,10 @@
                     <button class="btn btn-secondary btn-sm"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"></use></svg>Refresh</button>
                     <button class="btn btn-primary btn-lg">Get started</button>
                     <button class="btn-icon" aria-label="Show value"><svg class="icon" aria-hidden="true"><use href="#icon-eye"></use></svg></button>
-                    <button class="btn-icon" aria-label="Delete"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>
+                    <button class="btn btn-danger btn-icon" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>
+                    <button class="btn btn-danger btn-sm btn-icon" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>
                     <button class="job-action-btn">View</button>
-                    <button class="job-action-btn btn-danger">Delete</button>
+                    <button class="job-action-btn btn-danger job-action-icon" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button>
                 </div>
             </div>
         </section>
@@ -278,7 +279,7 @@
                         <thead><tr><th>Name</th><th>Schedule</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody>
                             <tr><td data-label="Name">Morning briefing</td><td data-label="Schedule"><code>0 7 * * 1-5</code></td><td data-label="Status"><span class="badge badge-on">Enabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn">Edit</button></div></td></tr>
-                            <tr><td data-label="Name">Weekly invoice check</td><td data-label="Schedule"><code>0 9 * * 1</code></td><td data-label="Status"><span class="badge badge-off">Disabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn btn-danger">Delete</button></div></td></tr>
+                            <tr><td data-label="Name">Weekly invoice check</td><td data-label="Schedule"><code>0 9 * * 1</code></td><td data-label="Status"><span class="badge badge-off">Disabled</span></td><td data-label="Actions"><div class="row-actions"><button class="job-action-btn">Run now</button><button class="job-action-btn btn-danger job-action-icon" aria-label="Delete" title="Delete"><svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg></button></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -304,7 +305,7 @@
                         <div class="modal-body">
                             <div class="form-group"><label for="ds-mcp">Server URL</label><input class="form-input" id="ds-mcp" placeholder="https://example.com/mcp"></div>
                         </div>
-                        <div class="modal-footer"><button class="btn btn-secondary">Cancel</button><button class="btn btn-primary">Connect &amp; add</button></div>
+                        <div class="modal-footer"><button class="btn btn-secondary">Cancel</button><button class="btn btn-primary">Connect and add</button></div>
                     </div>
                 </div>
                 <div class="flex-col gap-3">
@@ -314,7 +315,7 @@
                     <div class="toast ds-demo-toast">Started a new conversation</div>
                     <div class="ds-row">
                         <button class="btn btn-secondary btn-sm" onclick="toast.success('Settings saved')">Show success toast</button>
-                        <button class="btn btn-secondary btn-sm" onclick="modal.confirm('Delete artifact', 'Delete “Weekly report”? This cannot be undone.', () => {})">Open confirm dialog</button>
+                        <button class="btn btn-secondary btn-sm" onclick="modal.confirm('Delete artifact?', 'Delete “Weekly report”? This cannot be undone.', () => {}, { confirmText: 'Delete', danger: true })">Open confirm dialog</button>
                     </div>
                 </div>
             </div>

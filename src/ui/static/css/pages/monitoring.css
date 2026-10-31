@@ -332,6 +332,9 @@
 }
 
 .graph-node-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     flex: 1;
     min-width: 120px;
     color: var(--color-text);
@@ -579,4 +582,20 @@
         padding-left: 0;
         padding-right: 0;
     }
+}
+
+/* Lucide icons inside graph chips, badges and node titles */
+.graph-meta-chip .icon,
+.graph-badge .icon,
+.graph-var-chip .icon,
+.graph-node-title .icon {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.graph-node-title .icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-secondary);
 }

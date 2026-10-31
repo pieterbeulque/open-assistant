@@ -69,7 +69,7 @@ All components live in `css/components.css`. Existing class names used by the Ja
 
 | Component | Markup |
 | --- | --- |
-| Button | `.btn` + `.btn-primary` / `.btn-secondary` / `.btn-ghost` / `.btn-danger` / `.btn-success`, sizes `.btn-sm` / `.btn-lg`, `.btn-block`; icon-only `.btn-icon` |
+| Button | `.btn` + `.btn-primary` / `.btn-secondary` / `.btn-ghost` / `.btn-danger` / `.btn-success` / `.btn-destructive`, sizes `.btn-sm` / `.btn-lg`, `.btn-block`; icon-only `.btn-icon` (always square) |
 | Form | `.form-group` > `.form-label` + `.form-input` / `.form-select` / `.form-textarea` + `.form-hint`; `.input-group`; `.form-control-sm` for compact filters |
 | Toggle | `label.toggle-label` > `input.toggle-input` + `span.toggle-slider` (+ `span.toggle-text`) |
 | Checkbox / radio | Native inputs (tinted via `accent-color`), `.checkbox-label`, `.radio-label`, `.radio-group` |
@@ -81,6 +81,13 @@ All components live in `css/components.css`. Existing class names used by the Ja
 | Modal | `.modal` > `.modal-content` > `.modal-header` / `.modal-body` / `.modal-footer`; `ModalManager` in `common.js` produces the same look |
 | Toast | `toast.success()` / `.error()` / `.warning()` / `.info()` from `common.js` |
 | Feedback | `.spinner`, `.skeleton`, `.empty-state` |
+
+## Buttons and actions
+
+- **Delete and remove** are always a square trash icon button in the shaded red `.btn-danger` style, never a text button. Use `trashButton(onclick, label)` from `js/components.js`; the label becomes the tooltip and accessible name. Inside tables pass `'job-action-btn'` as the third argument.
+- **Destructive confirmations** (the "Delete", "Reset" or "Stop" button inside a confirm dialog) use the solid red `.btn-destructive`. Ask with `await modal.ask(title, message, { confirmText, danger: true })` instead of `window.confirm()`.
+- **Icon buttons are square.** `.btn-icon` is 40×40 (32×32 with `.btn-sm`, 44×44 on touch screens). Combine it with a variant (`.btn .btn-danger .btn-icon`) to keep that variant's colours.
+- **Button groups are right-aligned**: modal footers, card footers, `.btn-row`, `.settings-actions` and table row actions. In tables the last column fills the remaining width and its actions sit flush right; wide tables scroll horizontally inside `.table-scroll` / `.jobs-table-wrap`.
 
 ## Icons
 
@@ -95,4 +102,4 @@ Icons are [Lucide](https://lucide.dev) (ISC licence), bundled as an inline SVG s
 
 ## Writing UI copy
 
-Use sentence case for headings, buttons and tabs ("Add agent", not "Add Agent"). Keep labels short and friendly, and say what will happen ("Yes, stop it" rather than "OK").
+Use sentence case for titles, subtitles, buttons, tabs, table headers and form labels ("Add agent", not "Add Agent"). Product names and acronyms keep their capitals ("Google Ads", "API key"). Keep subtitles short; they wrap at 60 characters. Keep labels short and friendly, and say what will happen ("Yes, stop it" rather than "OK").

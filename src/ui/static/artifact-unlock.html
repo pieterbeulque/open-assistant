@@ -115,8 +115,8 @@
         }
         .gate-input:focus {
             outline: none;
-            border-color: var(--color-accent);
-            box-shadow: 0 0 0 3px var(--color-focus-ring);
+            border-color: color-mix(in oklab, var(--color-accent) 60%, var(--color-border-control));
+            box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 10%, transparent);
         }
         .gate-button {
             width: 100%;

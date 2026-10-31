@@ -139,7 +139,7 @@
                                 <button class="job-action-btn btn-neutral" onclick="copyLink('${a.artifact_id}')">${linkLabel}</button>
                                 <button class="job-action-btn btn-neutral" onclick="toggleVisibility('${a.artifact_id}', ${!a.is_public})">${toggleLabel}</button>
                                 <button class="job-action-btn btn-neutral" onclick="managePassphrase('${a.artifact_id}')">${secretLabel}</button>
-                                <button class="job-action-btn btn-danger" onclick="deleteArtifact('${a.artifact_id}')">Delete</button>
+                                ${trashButton(`deleteArtifact('${a.artifact_id}')`, 'Delete artifact', 'job-action-btn')}
                             </div>
                         </td>
                     </tr>`;
@@ -236,10 +236,11 @@
             wrap.appendChild(hint);
             wrap.appendChild(input);
 
-            const buttons = [{ text: 'Cancel', className: 'btn-secondary' }];
+            const buttons = [];
             if (a.has_secret) {
-                buttons.push({ text: 'Remove', className: 'btn-danger', onClick: () => removeSecret(id) });
+                buttons.push({ text: 'Remove passphrase', icon: 'trash', className: 'btn-danger', onClick: () => removeSecret(id) });
             }
+            buttons.push({ text: 'Cancel', className: 'btn-secondary' });
             buttons.push({
                 text: a.has_secret ? 'Change' : 'Set',
                 className: 'btn-primary',
@@ -278,7 +279,7 @@
         function deleteArtifact(id) {
             const a = find(id);
             const name = a ? (a.title || a.filename) : 'this artifact';
-            modal.confirm('Delete artifact', `Delete "${escapeHtml(name)}"? This cannot be undone.`, async () => {
+            modal.confirm('Delete artifact?', `Delete "${escapeHtml(name)}"? This cannot be undone.`, async () => {
                 try {
                     await api.delete(`/api/artifacts/${id}`);
                     toast.success('Artifact deleted');
@@ -286,7 +287,7 @@
                 } catch (error) {
                     toast.error('Failed to delete artifact');
                 }
-            });
+            }, { confirmText: 'Delete', danger: true });
         }
 
         document.addEventListener('DOMContentLoaded', loadArtifacts);

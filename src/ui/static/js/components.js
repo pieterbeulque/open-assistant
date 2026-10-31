@@ -78,6 +78,12 @@ const ICON_SPRITE = `
     <symbol id="icon-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
     <symbol id="icon-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/> <rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
     <symbol id="icon-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/> <path d="M7 11v4a2 2 0 0 0 2 2h4"/> <rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+    <symbol id="icon-brain" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/> <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/> <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/> <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/> <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/> <path d="M3.477 10.896a4 4 0 0 1 .585-.396"/> <path d="M19.938 10.5a4 4 0 0 1 .585.396"/> <path d="M6 18a4 4 0 0 1-1.967-.516"/> <path d="M19.967 17.484A4 4 0 0 1 18 18"/></symbol>
+    <symbol id="icon-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2"/> <line x1="12" x2="15" y1="14" y2="11"/> <circle cx="12" cy="14" r="8"/></symbol>
+    <symbol id="icon-send-message" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/> <path d="m21.854 2.147-10.94 10.939"/></symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/> <path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="icon-corner-down-right" viewBox="0 0 24 24"><polyline points="15 10 20 15 15 20"/> <path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+    <symbol id="icon-arrow-down-to-line" viewBox="0 0 24 24"><path d="M12 17V3"/> <path d="m6 11 6 6 6-6"/> <path d="M19 21H5"/></symbol>
     <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/> <path d="M20 3v4"/> <path d="M22 5h-4"/> <path d="M4 17v2"/> <path d="M5 18H3"/></symbol>
     <symbol id="icon-smartphone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/> <path d="M12 18h.01"/></symbol>
     <symbol id="icon-log-in" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/> <polyline points="10 17 15 12 10 7"/> <line x1="15" x2="3" y1="12" y2="12"/></symbol>
@@ -118,6 +124,17 @@ function icon(name, extraClass = '') {
     return `<svg class="icon${extraClass ? ' ' + extraClass : ''}" aria-hidden="true"><use href="#icon-${name}"></use></svg>`;
 }
 window.icon = icon;
+
+// Square trash button for every delete/remove action. Shaded red (.btn-danger)
+// so it reads as destructive; `label` becomes the tooltip and accessible name.
+//   trashButton("deleteAgent('x')", 'Remove agent')
+//   trashButton("deleteRow(1)", 'Delete', 'job-action-btn')   // inside tables
+function trashButton(onclick, label = 'Delete', classes = 'btn btn-danger btn-sm btn-icon') {
+    const safe = String(label).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const cls = classes === 'job-action-btn' ? 'job-action-btn btn-danger job-action-icon' : classes;
+    return `<button type="button" class="${cls}" onclick="${onclick}" title="${safe}" aria-label="${safe}">${icon('trash')}</button>`;
+}
+window.trashButton = trashButton;
 
 // Brand mark: a rounded tile in the accent colour with a simple, friendly
 // face. Drawn with currentColor/var() so it follows the theme and any

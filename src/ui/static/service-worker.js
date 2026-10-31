@@ -19,7 +19,9 @@
 // icons. Bump forces stale clients to drop the old green theme.
 // v8: Lucide icon sprite, Geist Mono for code, calmer (less green) states,
 // restyled offline page.
-const CACHE_VERSION = 'v8';
+// v9: design feedback pass - trash icon buttons, in-app confirm dialogs,
+// right-aligned actions, softer input focus. Bump so clients refetch CSS/JS.
+const CACHE_VERSION = 'v9';
 const CACHE_NAME = `personal-assistant-${CACHE_VERSION}`;
 
 // Derive base path from the SW's own registration scope.

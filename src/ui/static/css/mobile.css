@@ -93,8 +93,19 @@
     .sidebar-close-btn,
     .modal-close,
     .modal-close-btn {
+        width: 44px;
+        height: 44px;
         min-width: 44px;
         min-height: 44px;
+    }
+
+    /* Icon buttons stay square: small ones match .btn-sm's 38px */
+    .btn.btn-icon.btn-sm,
+    .icon-btn-sm {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
     }
 
     .tab {
@@ -207,6 +218,10 @@ body.is-pwa {
     .modal-card .modal-actions .btn,
     .modal-footer .btn {
         flex: 1;
+    }
+
+    .modal-footer .btn-icon {
+        flex: 0 0 auto;
     }
 
     .device-code-content {

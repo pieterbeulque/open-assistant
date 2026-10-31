@@ -123,6 +123,10 @@
     --color-accent-subtle: color-mix(in oklab, var(--color-accent) 7%, var(--color-surface));
     --color-accent-muted: color-mix(in oklab, var(--color-accent) 14%, var(--color-surface));
     --color-focus-ring: color-mix(in oklab, var(--color-accent) 30%, transparent);
+    /* Text inputs get a quieter focus treatment: a softened edge plus a
+       faint halo. The edge alone still meets 3:1 against the surface. */
+    --color-focus-border: color-mix(in oklab, var(--color-accent) 60%, var(--color-border-control));
+    --color-focus-ring-soft: color-mix(in oklab, var(--color-accent) 10%, transparent);
 
     /* Semantic families: fg = readable text/icon, bg = soft tint,
        border = tint edge, solid = small marks (dots, progress) */
@@ -140,6 +144,11 @@
     --color-danger-bg: var(--red-50);
     --color-danger-border: var(--red-200);
     --color-danger-solid: var(--red-500);
+    /* Solid red for the confirm button of a destructive dialog only.
+       White text on it is 5.4:1. */
+    --color-danger-emphasis: #b8413a;
+    --color-danger-emphasis-hover: var(--red-700);
+    --color-on-danger: #ffffff;
 
     /* Info / neutral are intentionally monochrome */
     --color-neutral-fg: var(--gray-700);
@@ -327,6 +336,9 @@
     --color-danger-bg: #351e1c;
     --color-danger-border: #55302c;
     --color-danger-solid: #e2766c;
+    --color-danger-emphasis: #b8413a;
+    --color-danger-emphasis-hover: #c74d43;
+    --color-on-danger: #ffffff;
 
     --color-neutral-fg: #b5b5af;
     --color-neutral-bg: #262624;

@@ -372,8 +372,8 @@
 .sidebar-filters input:focus,
 .sidebar-filters select:focus {
     outline: none;
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px var(--color-focus-ring);
+    border-color: var(--color-focus-border);
+    box-shadow: 0 0 0 3px var(--color-focus-ring-soft);
 }
 
 .sidebar-content {
@@ -565,6 +565,7 @@
 
 .settings-section > .section-title + p.text-muted,
 .settings-section .section-title-row p.text-muted {
+    max-width: 60ch;
     margin-bottom: var(--space-5);
 }
 
@@ -577,9 +578,18 @@
     margin-top: var(--space-1);
 }
 
+/* Form actions at the end of a section or tab: right-aligned, with room
+   above so they never touch the last field. */
 .settings-actions {
     display: flex;
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+}
+
+.tab-content > .settings-actions {
+    margin-top: 0;
 }
 
 .section-title-row {
@@ -716,20 +726,51 @@
     margin-left: var(--space-2);
 }
 
+/* Expand chevron: sits on top of the icon tile and only appears while the
+   card is hovered, swapping the service icon for a chevron. */
+.integration-icon {
+    position: relative;
+    overflow: hidden;
+}
+
 .expand-icon {
+    position: absolute;
+    inset: 0;
     display: inline-flex;
-    margin-left: var(--space-0-5);
-    color: var(--color-text-tertiary);
+    align-items: center;
+    justify-content: center;
+    background: var(--color-fill-active);
+    color: var(--color-text);
+    opacity: 0;
+    transition: opacity var(--duration-fast) ease;
+}
+
+.integration-icon > .expand-icon .icon {
+    width: 18px;
+    height: 18px;
     transition: transform var(--duration-base) var(--ease-out);
 }
 
-.expand-icon .icon {
-    width: 16px;
-    height: 16px;
+.integration-icon > .icon {
+    transition: opacity var(--duration-fast) ease;
 }
 
-.expand-icon.expanded {
+.integration-card:hover .expand-icon {
+    opacity: 1;
+}
+
+.integration-card:hover .integration-icon > .icon {
+    opacity: 0;
+}
+
+.expand-icon.expanded .icon {
     transform: rotate(180deg);
+}
+
+@media (hover: none) {
+    /* Touch screens have no hover: keep the service icon */
+    .integration-card:hover .expand-icon { opacity: 0; }
+    .integration-card:hover .integration-icon > .icon { opacity: 1; }
 }
 
 .integration-body {
@@ -831,6 +872,7 @@
 .agent-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: var(--space-3);
 }
 
@@ -910,8 +952,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xs);
     background: var(--color-surface);
@@ -1225,6 +1268,7 @@
 .session-controls {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: center;
     gap: var(--space-2);
 }
@@ -1269,6 +1313,7 @@
 
 .browser-session-add-actions {
     display: flex;
+    justify-content: flex-end;
     gap: var(--space-2);
     margin-top: var(--space-3);
 }
@@ -1342,6 +1387,11 @@
 
     .integration-actions .btn {
         flex: 1 1 100%;
+    }
+
+    .agent-footer .btn-icon,
+    .integration-actions .btn-icon {
+        flex: 0 0 auto;
     }
 
     .device-code {

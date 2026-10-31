@@ -1020,7 +1020,7 @@ class ConversationHistoryManager {
     updateLoadMoreButton() {
         if (loadMoreBtn) {
             loadMoreBtn.disabled = !this.hasMore || this.isLoading;
-            loadMoreBtn.textContent = this.isLoading ? 'Loading...' : 'Load More';
+            loadMoreBtn.textContent = this.isLoading ? 'Loading...' : 'Load more';
         }
     }
 }
