@@ -1029,8 +1029,14 @@ input[type="radio"] {
 }
 
 .modal-body {
-    padding: var(--space-5) var(--space-6);
+    /* Small top gap: the description reads as part of the title */
+    padding: var(--space-2) var(--space-6) var(--space-5);
     color: var(--color-text-secondary);
+}
+
+/* A form gets a little more room under the title than a description */
+.modal-body > .form-group:first-of-type {
+    margin-top: var(--space-2);
 }
 
 .modal-body > :not(.form-group):not(div) {
