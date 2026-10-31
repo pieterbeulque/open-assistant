@@ -674,6 +674,9 @@
                             const stepCount = job.steps ? job.steps.length : 1;
                             const stepLabel = stepCount === 1 ? '1 step' : `${stepCount} steps`;
                             const pinnedCount = job.steps ? job.steps.filter(s => s.tool_name).length : 0;
+                            // Rendered twice: in the actions on desktop, beside the name
+                            // on phones (monitoring.css shows one per layout).
+                            const runButton = `<button class="job-action-btn job-run-btn" onclick="runCronJobNow('${job.job_id}')" aria-label="Run ${escapeHtml(job.name)} now">${icon('play', 'icon-filled')}Run now</button>`;
                             return `
                             <tr>
                                 <td data-label="Enabled">
@@ -691,7 +694,7 @@
                                 <td class="job-name-cell">
                                     <div class="job-name">
                                         <strong>${escapeHtml(job.name)}</strong>
-                                        <button class="job-action-btn" onclick="runCronJobNow('${job.job_id}')" aria-label="Run ${escapeHtml(job.name)} now">${icon('play', 'icon-filled')}Run now</button>
+                                        ${runButton}
                                     </div>
                                 </td>
                                 <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
@@ -706,6 +709,7 @@
                                         <button class="job-action-btn" onclick="openEditPromptModal('${job.job_id}')">
                                             Edit recipe
                                         </button>
+                                        ${runButton}
                                         ${trashButton(`deleteCronJob('${job.job_id}')`, 'Delete cron job', 'job-action-btn')}
                                     </div>
                                 </td>

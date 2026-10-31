@@ -41,7 +41,6 @@
     font-size: var(--text-xs);
 }
 
-/* Job name with its "Run now" play button right after it */
 .job-name {
     display: inline-flex;
     align-items: center;
@@ -49,13 +48,21 @@
 }
 
 /* A solid glyph reads heavier than outline icons: match the label size */
-.job-name .job-action-btn .icon {
+.job-run-btn .icon {
     width: 12px;
     height: 12px;
 }
 
-/* Stacked into cards, the name is the card's first row (no label),
-   above the Enabled switch that comes first on desktop. */
+/* "Run now" sits with the other row actions on desktop... */
+@container table (min-width: 641px) {
+    .job-name .job-run-btn {
+        display: none;
+    }
+}
+
+/* ...and on phones it moves to the card's first row: the job name (no
+   label) on the left, "Run now" on the right, above the Enabled switch
+   that comes first on desktop. */
 @container table (max-width: 640px) {
     .jobs-table tr:has(> .job-name-cell) {
         display: flex;
@@ -64,6 +71,15 @@
 
     .jobs-table .job-name-cell {
         order: -1;
+    }
+
+    .job-name {
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .job-actions .job-run-btn {
+        display: none;
     }
 }
 
