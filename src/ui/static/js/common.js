@@ -245,15 +245,19 @@ function initTabs() {
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // Only handle tabs that point at a panel by id. Pages with their
+            // own tab logic (settings.js, monitoring) and plain segmented
+            // controls (no data-tab) are left alone.
             const targetId = tab.getAttribute('data-tab');
+            const target = targetId && document.getElementById(targetId);
+            if (!target) return;
 
-            // Remove active class from all tabs and contents
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const group = tab.closest('.tabs') || document;
+            group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            // Add active class to clicked tab and corresponding content
             tab.classList.add('active');
-            document.getElementById(targetId).classList.add('active');
+            target.classList.add('active');
         });
     });
 }

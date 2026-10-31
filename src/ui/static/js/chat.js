@@ -52,11 +52,9 @@ async function loadIntegrationStatus() {
 
 function displayIntegrationStatus(status) {
     // Add a subtle indicator in the UI showing available integrations.
-    // Themed via CSS (.integration-status in common.css) rather than
-    // inline styles, so it follows the app's dark palette instead of a
-    // hardcoded light-mode blue.
+    // Styled by .chat-status-bar in css/pages/chat.css.
     const statusDiv = document.createElement('div');
-    statusDiv.className = 'integration-status';
+    statusDiv.className = 'chat-status-bar';
 
     const toolCount = status.available_tools.length;
     const activeIntegrations = Object.entries(status.integrations)
@@ -143,6 +141,12 @@ async function executeCancel() {
 // Setup event listeners
 function setupEventListeners() {
     sendButton.addEventListener('click', sendMessage);
+    // Grow the composer with its content (capped by max-height in chat.css).
+    const autoGrow = () => {
+        messageInput.style.height = 'auto';
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
+    };
+    messageInput.addEventListener('input', autoGrow);
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -470,6 +474,7 @@ async function sendMessage() {
         addMessageToUI(message, 'user');
     }
     messageInput.value = '';
+    messageInput.style.height = '';
 
     // Clear attachments now that they've been included in the message
     attachedFiles = [];
@@ -666,7 +671,7 @@ function renderToolCallCard(container, event) {
     }
 
     card.innerHTML = `
-        <span class="tool-call-icon">🔧</span>
+        <span class="tool-call-icon"><svg class="icon" aria-hidden="true"><use href="#icon-tool"></use></svg></span>
         <span class="tool-call-body">
             <span class="tool-call-name">${escapeHtml(event.tool)}</span>
             ${argsSummary ? `<div class="tool-call-args">${escapeHtml(argsSummary)}</div>` : ''}
@@ -687,7 +692,11 @@ function updateToolCallCard(container, event) {
     card.classList.add(event.success ? 'done' : 'failed');
 
     const icon = card.querySelector('.tool-call-icon');
-    if (icon) icon.textContent = event.success ? '✓' : '✗';
+    if (icon) {
+        icon.innerHTML = event.success
+            ? '<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>'
+            : '<svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>';
+    }
 
     const statusEl = card.querySelector('.tool-call-status');
     if (statusEl) statusEl.textContent = event.success ? 'done' : 'failed';
@@ -801,7 +810,7 @@ function updateConversationDisplay() {
         if (conversationId) {
             conversationIdDisplay.textContent = `ID: ${conversationId.substring(0, 8)}...`;
         } else {
-            conversationIdDisplay.textContent = 'New Conversation';
+            conversationIdDisplay.textContent = 'New conversation';
         }
     }
 }

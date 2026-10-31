@@ -14,7 +14,10 @@
 // resolves the theme pre-paint. Bump forces stale clients to fetch both.
 // v6: Browser integration card gained the "Authenticated sessions" section
 // (settings.js + common.css). Bump forces stale clients to fetch both.
-const CACHE_VERSION = 'v6';
+// v7: new design system - css/ split into tokens/base/components/common/
+// mobile + pages/*, self-hosted Inter in static/fonts, new brand mark and
+// icons. Bump forces stale clients to drop the old green theme.
+const CACHE_VERSION = 'v7';
 const CACHE_NAME = `personal-assistant-${CACHE_VERSION}`;
 
 // Derive base path from the SW's own registration scope.
@@ -27,8 +30,15 @@ const STATIC_ASSETS = [
     BASE_PATH + '/',
     BASE_PATH + '/settings',
     BASE_PATH + '/monitoring',
+    BASE_PATH + '/static/css/tokens.css',
+    BASE_PATH + '/static/css/base.css',
+    BASE_PATH + '/static/css/components.css',
     BASE_PATH + '/static/css/common.css',
+    BASE_PATH + '/static/css/mobile.css',
+    BASE_PATH + '/static/css/pages/chat.css',
+    BASE_PATH + '/static/fonts/inter-latin-wght-normal.woff2',
     BASE_PATH + '/static/js/theme.js',
+    BASE_PATH + '/static/js/components.js',
     BASE_PATH + '/static/js/common.js',
     BASE_PATH + '/static/js/chat.js',
     BASE_PATH + '/static/js/settings.js',
