@@ -691,7 +691,7 @@
                                 <td class="job-name-cell">
                                     <div class="job-name">
                                         <strong>${escapeHtml(job.name)}</strong>
-                                        <button class="job-action-btn job-action-icon" onclick="runCronJobNow('${job.job_id}')" title="Run now" aria-label="Run ${escapeHtml(job.name)} now">${icon('play')}</button>
+                                        <button class="job-action-btn" onclick="runCronJobNow('${job.job_id}')" aria-label="Run ${escapeHtml(job.name)} now">${icon('play', 'icon-filled')}Run now</button>
                                     </div>
                                 </td>
                                 <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>

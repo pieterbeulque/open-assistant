@@ -30,6 +30,11 @@
     vertical-align: middle;
 }
 
+/* Solid variant for closed shapes, e.g. icon('play', 'icon-filled') */
+.icon-filled {
+    fill: currentColor;
+}
+
 .icon-sprite {
     position: absolute;
     width: 0;

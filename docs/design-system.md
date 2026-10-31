@@ -136,7 +136,7 @@ Viewport media queries are for page chrome only: navigation, sidebars, page padd
 
 Icons are [Lucide](https://lucide.dev) (ISC licence), bundled as an inline SVG sprite in `js/components.js` and generated from `lucide-static` 0.468.0. The design-system page lists every available icon.
 
-- In JavaScript: `icon('check')` returns the markup, and `icon('loader', 'icon-spin')` adds a class.
+- In JavaScript: `icon('check')` returns the markup, and `icon('loader', 'icon-spin')` adds a class. Add `icon-filled` for a solid closed shape, e.g. `icon('play', 'icon-filled')`.
 - In HTML: `<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>`.
 - Icons inherit `currentColor`. The `.icon` class sets a 1.75 stroke and a size of 1.15em; override `width`/`height` per context.
 - Services, agents and plugins map to Lucide icons in `getServiceIcon()` and `getAgentIcon()` (`js/settings.js`). The sprite ids are prefixed with `svc-` and `agent-`.
