@@ -660,10 +660,10 @@
                 <table class="jobs-table">
                     <thead>
                         <tr>
+                            <th><span class="sr-only">Enabled</span></th>
                             <th>Name</th>
                             <th>Schedule</th>
                             <th>Steps</th>
-                            <th>Status</th>
                             <th>Last run</th>
                             <th>Next run</th>
                             <th>Actions</th>
@@ -676,11 +676,8 @@
                             const pinnedCount = job.steps ? job.steps.filter(s => s.tool_name).length : 0;
                             return `
                             <tr>
-                                <td data-label="Name"><strong>${escapeHtml(job.name)}</strong></td>
-                                <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
-                                <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
-                                <td data-label="Status">
-                                    <label class="toggle-label">
+                                <td data-label="Enabled">
+                                    <label class="toggle-label" title="${job.enabled ? 'Disable' : 'Enable'} this job">
                                         <input
                                             type="checkbox"
                                             class="toggle-input"
@@ -689,9 +686,11 @@
                                             onchange="toggleCronJob('${job.job_id}', this)"
                                         >
                                         <span class="toggle-slider"></span>
-                                        <span class="toggle-text">${job.enabled ? 'Enabled' : 'Disabled'}</span>
                                     </label>
                                 </td>
+                                <td data-label="Name"><strong>${escapeHtml(job.name)}</strong></td>
+                                <td data-label="Schedule"><code>${escapeHtml(job.cron_expression)}</code></td>
+                                <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
                                 <td data-label="Last run">${job.last_run_at ? formatDateTime(job.last_run_at) : 'Never'}</td>
                                 <td data-label="Next run">${job.next_run_at ? formatDateTime(job.next_run_at) : 'N/A'}</td>
                                 <td data-label="Actions">
@@ -718,9 +717,7 @@
 
         async function toggleCronJob(jobId, input) {
             const enabled = input.checked;
-            const text = input.parentElement.querySelector('.toggle-text');
             input.disabled = true;
-            text.textContent = enabled ? 'Enabled' : 'Disabled';
             try {
                 await api.post(`/api/cron-jobs/${jobId}/toggle?enabled=${enabled}`);
                 toast.success(`Cron job ${enabled ? 'enabled' : 'disabled'}`);
@@ -730,7 +727,6 @@
                 toast.error('Failed to toggle cron job');
                 // Put the switch back where the server still has it.
                 input.checked = !enabled;
-                text.textContent = !enabled ? 'Enabled' : 'Disabled';
                 input.disabled = false;
             }
         }
