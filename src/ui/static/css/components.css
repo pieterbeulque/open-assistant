@@ -1358,6 +1358,18 @@ input[type="radio"] {
         text-align: left;
     }
 
+    /* A row with no actions (only a "—" .cell-placeholder) drops the
+       actions row from its card; the row above becomes the last one. */
+    .table-stack td:has(> :is(.row-actions, .job-actions) > .cell-placeholder:only-child),
+    .jobs-table td:has(> :is(.row-actions, .job-actions) > .cell-placeholder:only-child) {
+        display: none;
+    }
+
+    .table-stack tr:has(> td > :is(.row-actions, .job-actions) > .cell-placeholder:only-child) > td:nth-last-child(2),
+    .jobs-table tr:has(> td > :is(.row-actions, .job-actions) > .cell-placeholder:only-child) > td:nth-last-child(2) {
+        border-bottom: none;
+    }
+
     /* An actions cell needs no "Actions" label: the buttons speak for
        themselves and get the full width of the card. */
     .table-stack td:has(> .row-actions, > .job-actions)::before,

@@ -819,7 +819,7 @@
                                             <button class="job-action-btn btn-danger" onclick="cancelFutureTask('${task.task_id}')">
                                                 Cancel
                                             </button>
-                                        ` : '<span class="text-tertiary">—</span>'}
+                                        ` : '<span class="text-tertiary cell-placeholder">—</span>'}
                                     </div>
                                 </td>
                             </tr>
@@ -889,7 +889,7 @@
                             <th>Started</th>
                             <th>Duration</th>
                             <th>Status</th>
-                            <th>Details</th>
+                            <th><span class="sr-only">Details</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -902,7 +902,7 @@
 
                             return `
                                 <tr>
-                                    <td data-label="Job name"><strong>${escapeHtml(exec.job_name || 'Unknown')}</strong></td>
+                                    <td><strong>${escapeHtml(exec.job_name || 'Unknown')}</strong></td>
                                     <td data-label="Type">${exec.job_type === 'cron' ? 'Cron job' : 'Future task'}</td>
                                     <td data-label="Started">${formatDateTime(exec.started_at)}</td>
                                     <td data-label="Duration">${duration !== 'N/A' ? duration + 's' : duration}</td>
@@ -917,7 +917,7 @@
                                             <button class="job-action-btn" onclick="toggleExecutionDetails('exec-${idx}')">
                                                 Show details
                                             </button>
-                                        ` : '<span class="text-tertiary">—</span>'}
+                                        ` : '<span class="text-tertiary cell-placeholder">—</span>'}
                                         </div>
                                     </td>
                                 </tr>
