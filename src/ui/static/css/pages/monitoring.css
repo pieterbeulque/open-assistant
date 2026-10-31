@@ -308,11 +308,11 @@
     font-size: var(--text-sm);
 }
 
-.recipe-step .form-group {
+.recipe-step > .form-group {
     margin-bottom: var(--space-2);
 }
 
-.recipe-step .form-group:last-child {
+.recipe-step > .form-group:last-child {
     margin-bottom: 0;
 }
 

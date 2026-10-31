@@ -1176,6 +1176,10 @@ input[type="radio"] {
 .jobs-table-wrap,
 .audit-log {
     container: table / inline-size;
+    /* Contains the visually-hidden <thead> of a stacked table, which is
+       absolutely positioned and would otherwise escape the page's scroll
+       container (rows can now stack in a narrow card on a wide screen). */
+    position: relative;
     width: 100%;
     min-width: 0;
     overflow-x: auto;
@@ -1577,10 +1581,10 @@ p.text-muted {
 .grow { flex: 1; min-width: 0; }
 .self-start { align-self: flex-start; }
 
-/* Two equal columns that collapse to one in a narrow container */
+/* Two equal columns; a lone field keeps its half width */
 .form-grid-2 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
     margin-bottom: var(--space-2);
 }
