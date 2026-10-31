@@ -676,12 +676,11 @@
                             const stepCount = job.steps ? job.steps.length : 1;
                             const stepLabel = stepCount === 1 ? '1 step' : `${stepCount} steps`;
                             const pinnedCount = job.steps ? job.steps.filter(s => s.tool_name).length : 0;
-                            const stepDetail = pinnedCount > 0 ? ` (${pinnedCount} pinned)` : '';
                             return `
                             <tr>
                                 <td data-label="Name"><strong>${escapeHtml(job.name)}</strong></td>
                                 <td data-label="Schedule"><code style="font-size: 0.85rem;">${escapeHtml(job.cron_expression)}</code></td>
-                                <td data-label="Steps" style="white-space:nowrap">${stepLabel}<span style="color:var(--text-secondary);font-size:0.8rem">${stepDetail}</span></td>
+                                <td data-label="Steps">${stepLabel}${pinnedCount > 0 ? `<div class="cell-sub">${pinnedCount} pinned</div>` : ''}</td>
                                 <td data-label="Status">
                                     <span class="status-badge-inline status-badge-${job.enabled ? 'enabled' : 'disabled'}">
                                         ${job.enabled ? 'Enabled' : 'Disabled'}
@@ -691,9 +690,7 @@
                                 <td data-label="Next run">${job.next_run_at ? formatDateTime(job.next_run_at) : 'N/A'}</td>
                                 <td data-label="Actions">
                                     <div class="job-actions">
-                                        <button class="job-action-btn" onclick="openRecipeGraphModal('${job.job_id}')" title="Visualize recipe flow">
-                                            Graph
-                                        </button>
+                                        <button class="job-action-btn job-action-icon" onclick="openRecipeGraphModal('${job.job_id}')" title="View recipe flow" aria-label="View recipe flow">${icon('workflow')}</button>
                                         <button class="job-action-btn" onclick="openEditPromptModal('${job.job_id}')">
                                             Edit recipe
                                         </button>
@@ -905,11 +902,13 @@
                                         </span>
                                     </td>
                                     <td data-label="Details">
+                                        <div class="job-actions">
                                         ${exec.error_message || exec.result ? `
                                             <button class="job-action-btn" onclick="toggleExecutionDetails('exec-${idx}')">
                                                 Show details
                                             </button>
-                                        ` : '-'}
+                                        ` : '<span style="color:var(--text-muted)">—</span>'}
+                                        </div>
                                     </td>
                                 </tr>
                                 ${exec.error_message || exec.result ? `
